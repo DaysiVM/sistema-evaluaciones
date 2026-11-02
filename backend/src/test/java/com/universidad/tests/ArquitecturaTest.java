@@ -6,6 +6,7 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
 class ArquitecturaTest {
     private static final JavaClasses CLASES = new ClassFileImporter()
@@ -24,6 +25,36 @@ class ArquitecturaTest {
     void controllerNoAccedeAInfraestructura() {
         noClasses().that().resideInAPackage("..controller..")
                 .should().dependOnClassesThat().resideInAPackage("..infrastructure..")
+                .allowEmptyShould(true).check(CLASES);
+    }
+
+    @Test
+    void dominioNoDependeDeOtrasCapas() {
+        noClasses().that().resideInAPackage("..domain..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "..controller..", "..application..", "..infrastructure..", "..dto..", "..mapper..")
+                .allowEmptyShould(true).check(CLASES);
+    }
+
+    @Test
+    void applicationNoUsaControllerHttpNiJpa() {
+        noClasses().that().resideInAPackage("..application..")
+                .should().dependOnClassesThat().resideInAnyPackage(
+                        "..controller..", "..infrastructure..", "org.springframework.web..", "jakarta.servlet..",
+                        "jakarta.persistence..", "org.springframework.data.jpa..")
+                .allowEmptyShould(true).check(CLASES);
+    }
+
+    @Test
+    void infraestructuraNoUsaControllerNiApplication() {
+        noClasses().that().resideInAPackage("..infrastructure..")
+                .should().dependOnClassesThat().resideInAnyPackage("..controller..", "..application..")
+                .allowEmptyShould(true).check(CLASES);
+    }
+
+    @Test
+    void paquetesSinCiclos() {
+        slices().matching("com.universidad.tests.(*)..").should().beFreeOfCycles()
                 .allowEmptyShould(true).check(CLASES);
     }
 
