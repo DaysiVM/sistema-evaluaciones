@@ -29,6 +29,13 @@ class ArquitecturaTest {
     }
 
     @Test
+    void controllerNoExponeEntidadesDeDominio() {
+        noClasses().that().resideInAPackage("..controller..")
+                .should().dependOnClassesThat().resideInAPackage("..domain.model..")
+                .allowEmptyShould(true).check(CLASES);
+    }
+
+    @Test
     void dominioNoDependeDeOtrasCapas() {
         noClasses().that().resideInAPackage("..domain..")
                 .should().dependOnClassesThat().resideInAnyPackage(
