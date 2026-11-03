@@ -1,8 +1,20 @@
+import { createBrowserRouter } from 'react-router';
+import { RouterProvider } from 'react-router/dom';
+import { Plantilla } from './components/Plantilla';
+import { rutasAcceso } from './features/acceso/rutas';
+import { rutasBfa } from './features/bfa/rutas';
+import { rutasCatalogo } from './features/catalog/rutas';
+import { rutasEvaluacion } from './features/evaluacion/rutas';
+import { rutasResultados } from './features/resultados/rutas';
+
+// Cada módulo declara sus rutas en features/<modulo>/rutas.tsx; este archivo solo las reúne.
+const router = createBrowserRouter([
+  {
+    element: <Plantilla />,
+    children: [...rutasCatalogo, ...rutasEvaluacion, ...rutasResultados, ...rutasAcceso, ...rutasBfa],
+  },
+]);
+
 export function App() {
-  return (
-    <main className="app">
-      <h1>Sistema Integrado de Evaluaciones</h1>
-      <p>Esqueleto inicial de React. Módulos pendientes de implementación.</p>
-    </main>
-  );
+  return <RouterProvider router={router} />;
 }
