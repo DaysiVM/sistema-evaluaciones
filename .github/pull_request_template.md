@@ -19,6 +19,7 @@
 - [ ] Contratos y documentación actualizados
 - [ ] Sin regresiones en módulos anteriores
 - [ ] No hay secretos ni datos personales reales
+- [ ] Si es código de una tarea GEN o BFA: Testing lo probó (backend con `tests/api/`, frontend en el navegador) y puso la etiqueta `testing-ok`
 
 ## Revisión del equipo
 

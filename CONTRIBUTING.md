@@ -13,6 +13,7 @@ La rama `main` contiene la configuración inicial de Spring Boot, React, Postgre
 5. Usar Flyway para nuevas migraciones solo después de aprobar DOC-03. No modificar una migración ya aplicada.
 6. No subir datos reales, contraseñas, tokens ni archivos `.env`.
 7. La revisión y fusión corresponden a los integradores designados; testers y documentadores participan según la rotación. La ruleset activa de `main` exige `ci-ok`, una aprobación de CODEOWNERS, conversaciones resueltas y `Squash and merge`.
+8. **Orden PR → Testing → Integración (INT-08):** en un PR de código de una tarea `GEN-*` o `BFA-*`, Testing prueba la rama (backend con la colección Postman de `tests/api/`, frontend en el navegador) y, si pasa, pone la etiqueta `testing-ok` en GitHub; sin esa etiqueta el check `testing-ok` del CI falla y el PR no puede fusionarse. Las tareas `-TEST` e `-INT` y las que no son GEN ni BFA no la necesitan.
 
 ## Comprobación técnica inicial
 
