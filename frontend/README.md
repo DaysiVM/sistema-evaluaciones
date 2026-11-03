@@ -1,11 +1,21 @@
 # Frontend
 
+## Formato de código
+
+El CI exige `npm run lint` (ESLint) y `npm run format:check` (Prettier) en verde. Antes de subir un PR:
+
+```bash
+npm run format
+npm run lint
+```
+
+`npm run format` aplica Prettier sobre todo el proyecto; `npm run lint` revisa ESLint (hooks de React, imports, etc.) sin modificar archivos.
+
 ## Preview del sistema visual UI-01
 
 La preview local de `UI-01` permite revisar la interfaz común sin API, scoring ni datos reales. Al abrirla, usa el
 panel de controles “Variaciones del test” para cambiar los estados mediante botones; la URL solo conserva una forma
 opcional de iniciar una combinación concreta.
-
 
 Inicia el frontend desde este directorio:
 
@@ -21,18 +31,18 @@ http://localhost:5173/dev/ui-01
 
 ### Variaciones disponibles
 
-| URL | Qué muestra |
-| --- | --- |
-| `/dev/ui-01` | Pregunta de selección con cinco opciones |
-| `/dev/ui-01?response=text` | Campo de respuesta libre |
-| `/dev/ui-01?phase=instructions` | Pantalla de instrucciones |
-| `/dev/ui-01?phase=practice` | Pantalla de práctica |
-| `/dev/ui-01?phase=closed` | Subprueba cerrada |
-| `/dev/ui-01?notice=warning` | Aviso textual de tiempo |
-| `/dev/ui-01?notice=error` | Error textual |
-| `/dev/ui-01?save=saving` | Guardado en progreso |
-| `/dev/ui-01?save=error` | Error de guardado |
-| `/dev/ui-01?resource=visual` | Recurso visual de ejemplo |
+| URL                             | Qué muestra                              |
+| ------------------------------- | ---------------------------------------- |
+| `/dev/ui-01`                    | Pregunta de selección con cinco opciones |
+| `/dev/ui-01?response=text`      | Campo de respuesta libre                 |
+| `/dev/ui-01?phase=instructions` | Pantalla de instrucciones                |
+| `/dev/ui-01?phase=practice`     | Pantalla de práctica                     |
+| `/dev/ui-01?phase=closed`       | Subprueba cerrada                        |
+| `/dev/ui-01?notice=warning`     | Aviso textual de tiempo                  |
+| `/dev/ui-01?notice=error`       | Error textual                            |
+| `/dev/ui-01?save=saving`        | Guardado en progreso                     |
+| `/dev/ui-01?save=error`         | Error de guardado                        |
+| `/dev/ui-01?resource=visual`    | Recurso visual de ejemplo                |
 
 Los parámetros se pueden combinar. Por ejemplo:
 

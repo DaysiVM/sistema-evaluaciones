@@ -8,7 +8,12 @@
   --uam-action: #006e7a;
   color: var(--test-ink);
   background: var(--test-background);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -109,7 +114,7 @@ button {
   cursor: pointer;
 }
 
-.preview-choice[aria-pressed="true"] {
+.preview-choice[aria-pressed='true'] {
   color: var(--test-paper);
   background: var(--uam-action);
   border-color: var(--test-ink);
@@ -132,7 +137,7 @@ button {
   overflow: hidden;
   background: var(--test-paper);
   border: 1px solid var(--test-line);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: Georgia, 'Times New Roman', serif;
 }
 
 .test-header,
@@ -154,7 +159,7 @@ button {
 
 .test-timer {
   color: var(--test-ink);
-  font-family: "Courier New", Courier, monospace;
+  font-family: 'Courier New', Courier, monospace;
   font-size: 0.9rem;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;

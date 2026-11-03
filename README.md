@@ -40,11 +40,22 @@ El backend **no expone endpoints de evaluación**; solo puede exponer el estado 
 mvn -f backend/pom.xml verify
 cd frontend
 npm ci
+npm run lint
+npm run format:check
 npm run typecheck
 npm run build
 ```
 
 GitHub Actions valida la compilación del esqueleto. Cuando se desarrollen funcionalidades, se agregarán pruebas y criterios de aceptación.
+
+## Formato de código
+
+El CI revisa el formato, no las personas: `mvn verify` incluye `spotless:check` (Google Java Format, estilo AOSP) y el CI de frontend corre ESLint y Prettier. Para aplicar el formato antes de subir un PR:
+
+```bash
+mvn -f backend/pom.xml spotless:apply
+cd frontend && npm run format
+```
 
 ## Trabajo por ramas y revisión de Pull Requests
 

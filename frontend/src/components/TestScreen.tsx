@@ -39,7 +39,10 @@ function formatRemainingTime(seconds: number | null) {
   return `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
 }
 
-const phaseDefaults: Record<Exclude<TestPhase, 'active'>, { label: string; title: string; description: string }> = {
+const phaseDefaults: Record<
+  Exclude<TestPhase, 'active'>,
+  { label: string; title: string; description: string }
+> = {
   instructions: {
     label: 'Instrucciones',
     title: 'Instrucciones de ejemplo',
@@ -82,14 +85,18 @@ export function TestScreen({
   const isActiveQuestion = phase === 'active';
   const phaseCopy = phase === 'active' ? null : phaseDefaults[phase];
   const timerValue = formatRemainingTime(timeRemainingSeconds);
-  const timerSeconds = timeRemainingSeconds === null ? undefined : Math.max(0, timeRemainingSeconds);
+  const timerSeconds =
+    timeRemainingSeconds === null ? undefined : Math.max(0, timeRemainingSeconds);
   const sectionHeadingId = isActiveQuestion ? headingId : `${headingId}-phase`;
 
   return (
     <section className="test-paper" aria-labelledby={sectionHeadingId}>
       <header className="test-header">
         <span className="test-name">{testName}</span>
-        <time className="test-timer" dateTime={timerSeconds === undefined ? undefined : `PT${timerSeconds}S`}>
+        <time
+          className="test-timer"
+          dateTime={timerSeconds === undefined ? undefined : `PT${timerSeconds}S`}
+        >
           {timerValue}
         </time>
       </header>
@@ -120,7 +127,10 @@ export function TestScreen({
                 ))}
               </div>
             ) : (
-              <TextResponseField value={textResponse} onChange={onTextResponse ?? (() => undefined)} />
+              <TextResponseField
+                value={textResponse}
+                onChange={onTextResponse ?? (() => undefined)}
+              />
             )}
           </>
         ) : (

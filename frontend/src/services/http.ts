@@ -24,7 +24,8 @@ export async function http<T>(ruta: string, opciones: RequestInit = {}): Promise
     ...opciones,
     headers: { 'Content-Type': 'application/json', ...opciones.headers },
   });
-  const cuerpo = respuesta.status === 204 ? undefined : await respuesta.json().catch(() => undefined);
+  const cuerpo =
+    respuesta.status === 204 ? undefined : await respuesta.json().catch(() => undefined);
   if (!respuesta.ok) throw new ApiError(respuesta.status, cuerpo);
   return cuerpo as T;
 }

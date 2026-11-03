@@ -79,7 +79,11 @@ function getPreviewResource(showResource: boolean) {
   if (!showResource) return undefined;
 
   return (
-    <div className="question-resource-placeholder" role="img" aria-label="Recurso visual de ejemplo">
+    <div
+      className="question-resource-placeholder"
+      role="img"
+      aria-label="Recurso visual de ejemplo"
+    >
       Recurso visual de ejemplo
     </div>
   );
@@ -100,7 +104,9 @@ export function Ui01Preview() {
   const [responseType, setResponseType] = useState<TestResponseType>(getPreviewResponseType);
   const [saveState, setSaveState] = useState<PreviewSaveState>(getPreviewSaveState);
   const [noticeKind, setNoticeKind] = useState<PreviewNoticeKind>(getPreviewNoticeKind);
-  const [showResource, setShowResource] = useState(() => getSearchParams().get('resource') === 'visual');
+  const [showResource, setShowResource] = useState(
+    () => getSearchParams().get('resource') === 'visual',
+  );
 
   const handleNext = () => {
     setQuestionNumber((current) => (current === 3 ? 1 : current + 1));
@@ -115,8 +121,8 @@ export function Ui01Preview() {
           <p className="preview-eyebrow">UI-01 · herramienta de preview</p>
           <h1 id="preview-title">Variaciones del test</h1>
           <p>
-            Estos controles son temporales y solo sirven para revisar la biblioteca visual antes de conectarla al
-            flujo real de evaluación.
+            Estos controles son temporales y solo sirven para revisar la biblioteca visual antes de
+            conectarla al flujo real de evaluación.
           </p>
         </div>
 
@@ -211,7 +217,6 @@ export function Ui01Preview() {
             </div>
           </fieldset>
         </div>
-
       </section>
 
       <div className="test-stage">

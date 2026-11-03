@@ -12,7 +12,13 @@ import { rutasResultados } from './features/resultados/rutas';
 const router = createBrowserRouter([
   {
     element: <Plantilla />,
-    children: [...rutasCatalogo, ...rutasEvaluacion, ...rutasResultados, ...rutasAcceso, ...rutasBfa],
+    children: [
+      ...rutasCatalogo,
+      ...rutasEvaluacion,
+      ...rutasResultados,
+      ...rutasAcceso,
+      ...rutasBfa,
+    ],
   },
   // Vista previa de UI-01 (contenido demostrativo).
   { path: 'dev/ui-01', element: <Ui01Preview /> },
