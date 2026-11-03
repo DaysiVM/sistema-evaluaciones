@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 import { Plantilla } from './components/Plantilla';
+import { Ui01Preview } from './dev/Ui01Preview';
 import { rutasAcceso } from './features/acceso/rutas';
 import { rutasBfa } from './features/bfa/rutas';
 import { rutasCatalogo } from './features/catalog/rutas';
@@ -13,6 +14,8 @@ const router = createBrowserRouter([
     element: <Plantilla />,
     children: [...rutasCatalogo, ...rutasEvaluacion, ...rutasResultados, ...rutasAcceso, ...rutasBfa],
   },
+  // Vista previa de UI-01 (contenido demostrativo).
+  { path: 'dev/ui-01', element: <Ui01Preview /> },
 ]);
 
 export function App() {
