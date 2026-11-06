@@ -1,0 +1,20 @@
+/* BFA-FE-06 · familia Numérico. Usa los tokens de UI-01 y las piezas de UI-04 (styles.css). */
+
+/* Fracción con signo: el signo queda a la izquierda de la barra, no encima. */
+.num-fraccion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.05em;
+}
+
+/* Problemas: área de lectura amplia y texto de buen tamaño (RNF-NUM-PRO-01). */
+.numerico--problema .question-prompt--statement {
+  max-width: 46rem;
+  font-size: clamp(1.15rem, 2.6vw, 1.4rem);
+  line-height: 1.6;
+}
+
+/* Alternativas con fracciones o decimales: cifras alineadas y fracción centrada en la línea. */
+.numerico .answer-option-label .fraccion {
+  margin: 0 0.1em;
+}
