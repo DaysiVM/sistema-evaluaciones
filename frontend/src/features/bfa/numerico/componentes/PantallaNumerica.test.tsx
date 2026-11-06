@@ -135,6 +135,34 @@ describe('PantallaNumerica', () => {
   });
 });
 
+describe('fin de la subprueba y espera', () => {
+  it('en la última pregunta el botón es «Terminé»', async () => {
+    const [p] = await preguntasDe('N2-A');
+    expect(html('N2-A', p, { indice: 5, total: 6 })).toContain('>Terminé<');
+    expect(html('N2-A', p, { indice: 2, total: 6 })).toContain('>Siguiente<');
+  });
+
+  it('la espera muestra el reloj y lo respondido, sin alternativas', () => {
+    const marcado = html('N1-A', undefined, {
+      fase: 'espera',
+      segundosRestantes: 95,
+      respondidas: 38,
+      total: 40,
+    });
+    expect(marcado).toContain('En espera');
+    expect(marcado).toContain('>01:35<');
+    expect(marcado).toContain('Respondiste 38 de 40 operaciones');
+    expect(marcado).toContain('No se puede pasar a la siguiente antes del tiempo');
+    expect(marcado).not.toContain('radiogroup');
+  });
+
+  it('solo N2 permite volver a revisar desde la espera', () => {
+    const conRevision = { fase: 'espera' as const, onRevisar: nada };
+    expect(html('N1-B', undefined, conRevision)).not.toContain('Volver a revisar');
+    expect(html('N2-B', undefined, conRevision)).toContain('Volver a revisar');
+  });
+});
+
 describe('rendimiento del cambio entre operaciones (RNF-NUM-SUM-01)', () => {
   it('dibujar la operación siguiente tarda menos de 100 ms', async () => {
     const preguntas = await preguntasDe('N1-A');

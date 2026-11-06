@@ -95,3 +95,16 @@ export function letraDeTecla(config: ConfigNumerica, tecla: string): string | nu
   }
   return config.letras.includes(t) ? t : null;
 }
+
+/** Subprueba que sigue en el orden oficial de la familia, o `null` después de N2-B. */
+export function siguienteSubprueba(codigo: CodigoNumerico): CodigoNumerico | null {
+  const posicion = CODIGOS_NUMERICO.indexOf(codigo);
+  return CODIGOS_NUMERICO[posicion + 1] ?? null;
+}
+
+/** Tiempo en formato mm:ss, sin bajar de cero. */
+export function formatearTiempo(segundos: number | null): string {
+  if (segundos === null) return '—';
+  const seguro = Math.max(0, segundos);
+  return `${String(Math.floor(seguro / 60)).padStart(2, '0')}:${String(seguro % 60).padStart(2, '0')}`;
+}

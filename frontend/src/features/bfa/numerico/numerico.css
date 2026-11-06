@@ -18,3 +18,115 @@
 .numerico .answer-option-label .fraccion {
   margin: 0 0.1em;
 }
+
+/* Página de la sección: mismo ancho, cabecera y panel que GEN-02/GEN-05 (tokens de UI-01). */
+.num-pagina {
+  width: min(100% - 2rem, 980px);
+  margin: 0 auto;
+  padding: clamp(1rem, 4vw, 2.5rem) 0 3rem;
+}
+
+.num-pagina-cabecera h1 {
+  margin: 0 0 0.35rem;
+  font-size: clamp(1.4rem, 3vw, 1.9rem);
+}
+
+.num-pagina-cabecera p {
+  margin: 0 0 1.5rem;
+  color: var(--test-secondary);
+}
+
+.num-panel {
+  padding: clamp(1rem, 3vw, 1.75rem);
+  background: var(--test-paper);
+  border: 1px solid var(--test-line);
+}
+
+/* Avance de la familia, con el estilo de las pestañas de GEN-02. */
+.num-avance {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.25rem;
+  margin: 0 0 -1px;
+  padding: 0;
+  list-style: none;
+}
+
+.num-avance-paso {
+  display: grid;
+  gap: 0.1rem;
+  padding: 0.6rem 0.8rem;
+  color: var(--test-secondary);
+  border: 1px solid transparent;
+  border-bottom: 0;
+}
+
+.num-avance-paso--en-curso {
+  color: var(--test-ink);
+  background: var(--test-paper);
+  border-color: var(--test-line);
+  box-shadow: inset 0 3px 0 var(--uam-primary);
+}
+
+.num-avance-codigo {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.num-avance-nombre {
+  font-weight: 600;
+}
+
+.num-avance-estado {
+  font-size: 0.85rem;
+}
+
+.num-avance-paso--cerrada .num-avance-estado::before {
+  content: '✓ ';
+}
+
+@media (max-width: 640px) {
+  .num-avance {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Página final */
+.num-fin-tabla {
+  width: 100%;
+  margin-top: 1rem;
+  border-collapse: collapse;
+}
+
+.num-fin-tabla th,
+.num-fin-tabla td {
+  padding: 0.55rem 0.4rem;
+  text-align: left;
+  border-bottom: 1px solid var(--test-line);
+}
+
+.num-fin-tabla td {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Herramientas de desarrollo de la vista previa: fuera del papel del test. */
+.num-dev {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  margin-top: 1.25rem;
+  padding: 0.75rem 1rem;
+  color: var(--test-secondary);
+  font-size: 0.9rem;
+  border: 1px dashed var(--test-line);
+}
+
+.num-dev strong {
+  color: var(--test-ink);
+}
+
+.num-panel > .numerico > .test-paper,
+.num-panel > .test-paper {
+  margin: 0 auto;
+}
