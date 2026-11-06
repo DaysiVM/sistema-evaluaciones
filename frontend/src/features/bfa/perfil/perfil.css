@@ -1,0 +1,198 @@
+/* Perfil de resultados BFA (UI-05). Usa los tokens de styles.css y las clases res- de GEN-05. */
+
+/* Evita que el ancho mínimo de las tablas ensanche la página: en pantallas angostas se desplazan. */
+.perfil,
+.perfil-areas {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.perfil-resumen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  background: var(--test-paper);
+  border: 1px solid var(--test-line);
+}
+
+.perfil-resumen p {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.perfil-leyenda {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.9rem;
+  color: var(--test-secondary);
+}
+
+.perfil-leyenda p {
+  margin: 0;
+}
+
+.perfil-areas {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.perfil-area h3,
+.perfil-seccion-compuestos h3 {
+  margin: 0 0 0.5rem;
+  padding-bottom: 0.35rem;
+  font-size: 1.05rem;
+  border-bottom: 3px solid var(--uam-primary);
+}
+
+.perfil-tabla {
+  min-width: 40rem;
+  table-layout: fixed;
+}
+
+/* Mismas columnas en todas las áreas para comparar los factores de un vistazo. */
+.perfil-tabla thead th:nth-child(1) {
+  width: 27%;
+}
+.perfil-tabla thead th:nth-child(2) {
+  width: 14%;
+}
+.perfil-tabla thead th:nth-child(3) {
+  width: 11%;
+}
+.perfil-tabla thead th:nth-child(4) {
+  width: 20%;
+}
+
+.perfil-tabla th[scope='row'] {
+  font-weight: 500;
+}
+
+.perfil-nombre {
+  display: block;
+}
+
+.perfil-codigo {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--test-secondary);
+}
+
+.perfil-fila--total th[scope='row'],
+.perfil-fila--total .perfil-pd,
+.perfil-fila--total .perfil-pc {
+  font-weight: 700;
+}
+
+.perfil-fila--total {
+  background: #f7fbfb;
+}
+
+.perfil-tabla .perfil-pd {
+  white-space: normal;
+}
+
+.perfil-celda-barra {
+  vertical-align: middle !important;
+}
+
+/* Pista de la escala 1–99: sin bandas ni líneas de referencia interpretativas. */
+.perfil-barra {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 0.7rem;
+  background: var(--test-background);
+  border: 1px solid var(--test-line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.perfil-barra-relleno {
+  position: absolute;
+  inset: 0 auto 0 0;
+  min-width: 0.6rem;
+  background: var(--uam-primary);
+  border-radius: 999px;
+}
+
+.perfil-barra--vacia {
+  background: transparent;
+  border-style: dashed;
+}
+
+.perfil-estado {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.perfil-insignias {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.perfil-estado .res-motivo {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.perfil-compuestos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 1rem;
+}
+
+.perfil-compuesto {
+  display: grid;
+  align-content: start;
+  gap: 0.6rem;
+  padding: 1rem;
+  background: var(--test-paper);
+  border: 1px solid var(--test-line);
+  border-top: 4px solid var(--uam-primary);
+}
+
+.perfil-compuesto--sin-dato {
+  border-top-color: var(--test-line);
+}
+
+.perfil-compuesto h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.perfil-formula {
+  margin: 0.2rem 0 0;
+  font-size: 0.8rem;
+  color: var(--test-secondary);
+}
+
+.perfil-valores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.perfil-valores dt {
+  font-size: 0.8rem;
+  color: var(--test-secondary);
+}
+
+.perfil-valores dd {
+  margin: 0.1rem 0 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.perfil-compuesto--sin-dato .perfil-valores dd {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--test-secondary);
+}
+
+abbr[title] {
+  text-decoration: none;
+  cursor: help;
+}
