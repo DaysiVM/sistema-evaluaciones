@@ -51,3 +51,28 @@ http://localhost:5173/dev/ui-01?save=error&resource=visual
 ```
 
 La preview usa contenido demostrativo y sirve para validar la biblioteca de componentes, los estados y la semántica accesible antes de conectarla al motor de evaluación.
+
+## Preview de variantes BFA (UI-04)
+
+`UI-04` extiende los componentes comunes de `UI-01` para los tipos de pregunta del BFA. Usa contenido de **ejemplo**
+(no son reactivos reales) y marcadores en lugar de las figuras oficiales. Con `npm run dev`, abre:
+
+```text
+http://localhost:5173/dev/ui-04
+http://localhost:5173/dev/ui-04?subprueba=N1-A
+```
+
+Cada subprueba (`VOC1`, `VOC2`, `S1`, `S2`, `S1b`, `R1`, `R2`, `CV`, `N1-A`, `N1-B`, `N2-A`, `N2-B`, `FV`) muestra su
+ficha con tiempo oficial, tipo de respuesta y requisito. También acepta `phase`, `save` y `notice` como en UI-01.
+
+| Tipo de contenido             | Cómo se compone                                                              |
+| ----------------------------- | ---------------------------------------------------------------------------- |
+| Selección (3, 4 o 5 opciones) | `optionsLayout="list"` o `"compact"` (rejilla de dos columnas)               |
+| Binaria (Verdadero / Falso)   | `optionsLayout="binary"`                                                     |
+| Figuras                       | `questionResource` con `<Figura rol="estimulo" />` y `figure` en cada opción |
+| Operaciones                   | `<Operacion>`, `<OperacionVertical>`, `<Fraccion>`, `<Casilla>` y `numeric`  |
+| Problemas y proverbios        | `promptVariant="statement"`                                                  |
+| Texto (Fluidez Verbal)        | `responseArea={<FluidezVerbal />}`                                           |
+
+Para usar figuras reales basta pasar `src` (el `recursoUrl` de la API) a `<Figura>`: sin `src` dibuja el marcador.
+Los componentes comunes siguen funcionando igual: todas las props nuevas de `TestScreen` son opcionales.
