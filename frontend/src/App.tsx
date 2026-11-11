@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router';
 import { RouterProvider } from 'react-router/dom';
 import { Plantilla } from './components/Plantilla';
 import { Ui01Preview } from './dev/Ui01Preview';
+import { Ui04Preview } from './dev/Ui04Preview';
 import { Ui05Preview } from './dev/Ui05Preview';
 import { rutasAcceso } from './features/acceso/rutas';
 import { rutasBfa } from './features/bfa/rutas';
@@ -23,6 +24,8 @@ const router = createBrowserRouter([
   },
   // Vista previa de UI-01 (contenido demostrativo).
   { path: 'dev/ui-01', element: <Ui01Preview /> },
+  // Vista previa de UI-04: variantes visuales de las subpruebas BFA (contenido de ejemplo).
+  { path: 'dev/ui-04', element: <Ui04Preview /> },
   // Vista previa de UI-05: diseño del perfil de resultados BFA (datos simulados).
   { path: 'dev/ui-05', element: <Ui05Preview /> },
 ]);
