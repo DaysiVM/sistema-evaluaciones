@@ -1,6 +1,1485 @@
 openapi: 3.0.3
 info:
   title: Sistema Integrado de Evaluaciones
-  version: 0.0.0
-  description: Esqueleto documental; todavía no hay endpoints REST de negocio aprobados.
-paths: {}
+  version: 0.1.0
+  description: >-
+    Contrato REST aprobado (DOC-05). Fuentes: Documento general §5.2 (convenciones, formato de error,
+    endpoints comunes E13–E21 y complementarios E22–E31 de §5.2.4) y Documento BFA §5 (E1–E12). Los nombres, códigos y ejemplos son los
+    del documento; los ejemplos usan datos ficticios. Toda operación exige sesión (Bearer, emitida
+    por E14) salvo E13, E14, E16 y E17.
+servers:
+  - url: http://localhost:8080
+    description: Desarrollo
+security:
+  - bearerAuth: []
+tags:
+  - name: Acceso
+    description: Cuentas y sesión (Documento general §5.2.3)
+  - name: Sujetos y periodos
+    description: Documento general §5.2.3
+  - name: Catálogo
+    description: Documento BFA §5.3
+  - name: Evaluaciones
+    description: Documento BFA §5.3
+  - name: Revisión y publicación
+    description: Documento BFA §5.5
+  - name: Configuración del test
+    description: Versiones, contenido, clave y baremo (Documento general §5.2.4)
+
+paths:
+  /api/v1/tests:
+    get:
+      tags: [Catálogo]
+      operationId: listarTests
+      summary: E1 — Consultar tests disponibles
+      description: Devuelve los tests activos del catálogo. Lista vacía si no hay tests activos. CU-BFA-P01.
+      responses:
+        '200':
+          description: Tests activos.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/TestResumenResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/tests/{testId}:
+    get:
+      tags: [Catálogo]
+      operationId: obtenerTest
+      summary: E2 — Consultar el test y sus subpruebas
+      description: >-
+        Devuelve el test y las configuraciones de la edición publicada identificada, en orden de
+        aplicación, sin preguntas ni claves. numeroPreguntas es el conteo de reactivos reales (FV tiene
+        0); maximoEntradas vale 75 en FV y nulo en selección. CU-BFA-P02.
+      parameters:
+        - $ref: '#/components/parameters/TestId'
+      responses:
+        '200':
+          description: Test con sus subpruebas.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TestDetalleResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: TEST_NO_ENCONTRADO — el test no existe.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/evaluaciones:
+    post:
+      tags: [Evaluaciones]
+      operationId: iniciarEvaluacion
+      summary: E3 — Iniciar una evaluación completa o parcial
+      description: >-
+        Crea una evaluación EN_CURSO para un sujeto. Sin subpruebas la aplicación es completa; con
+        subpruebas solo se aplican esas, en el orden oficial. sujetoId, periodoId y versionFormularioId
+        son obligatorios; testId, si se recibe, debe coincidir con la versión. Si incluye FV se envía
+        fluidez.letraInicial, salvo asignación previa autorizada. CU-BFA-P03.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/IniciarEvaluacionRequest' }
+      responses:
+        '201':
+          description: Evaluación creada (misma forma que E4).
+          headers:
+            Location:
+              description: /api/v1/evaluaciones/{evaluacionId}
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EvaluacionResponse' }
+        '400': { $ref: '#/components/responses/SolicitudInvalida' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: TEST_NO_ENCONTRADO, SUJETO_NO_ENCONTRADO o PERIODO_NO_ENCONTRADO.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: >-
+            VERSION_NO_PUBLICADA (la versión no está publicada); EVALUACION_EN_CURSO (el sujeto ya tiene
+            una abierta de ese test en ese periodo); LETRA_NO_ASIGNADA (incluye FV sin letra ni
+            asignación previa autorizada; no se crea la evaluación).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: VERSION_INCOMPATIBLE o SUBPRUEBA_NO_INCLUIDA.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+    get:
+      tags: [Evaluaciones]
+      operationId: listarEvaluaciones
+      summary: E22 — Listar las evaluaciones autorizadas
+      description: >-
+        El Sujeto ve las propias y los profesionales las de su alcance. Lista vacía si no hay.
+        CU-GEN-04, CU-GEN-19. Permiso RECUPERAR_INTENTO u OPERACION_AUTORIZAR.
+      parameters:
+        - { name: sujetoId, in: query, required: false, schema: { type: integer, format: int64 } }
+        - { name: testId, in: query, required: false, schema: { type: integer, format: int64 } }
+        - { name: periodoId, in: query, required: false, schema: { type: integer, format: int64 } }
+        - { name: estado, in: query, required: false, schema: { type: string, enum: [EN_CURSO, FINALIZADA] } }
+      responses:
+        '200':
+          description: Evaluaciones autorizadas (forma de E4).
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/EvaluacionResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/evaluaciones/{evaluacionId}:
+    get:
+      tags: [Evaluaciones]
+      operationId: consultarEvaluacion
+      summary: E4 — Consultar estado y progreso
+      description: >-
+        Devuelve el estado de la evaluación y de cada subprueba; sirve para retomar tras una caída sin
+        reiniciar el reloj. El tiempo restante lo calcula el servidor. Estados de subprueba
+        PENDIENTE → ACTIVA → CERRADA. CU-BFA-P04.
+      parameters:
+        - $ref: '#/components/parameters/EvaluacionId'
+      responses:
+        '200':
+          description: Estado de la evaluación.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EvaluacionResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: EVALUACION_NO_ENCONTRADA.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/evaluaciones/{evaluacionId}/subpruebas/{codigo}/instrucciones:
+    get:
+      tags: [Evaluaciones]
+      operationId: consultarInstrucciones
+      summary: E24 — Consultar instrucciones y ejemplos de práctica
+      description: >-
+        Instrucciones y ejemplos de práctica de una subprueba incluida, antes de E5 y sin consumir
+        tiempo; los ejemplos no cuentan para el puntaje. CU-GEN-09, CU-GEN-10. Permisos
+        INSTRUCCIONES_LEER y PRACTICA_REALIZAR.
+      parameters:
+        - $ref: '#/components/parameters/EvaluacionId'
+        - $ref: '#/components/parameters/CodigoSubprueba'
+      responses:
+        '200':
+          description: Instrucciones de la subprueba.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/InstruccionesResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: EVALUACION_NO_ENCONTRADA o SUBPRUEBA_NO_ENCONTRADA.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/evaluaciones/{evaluacionId}/subpruebas/{codigo}/iniciar:
+    post:
+      tags: [Evaluaciones]
+      operationId: iniciarSubprueba
+      summary: E5 — Arrancar el tiempo oficial de una subprueba
+      description: >-
+        El servidor guarda inicio y fin límite. Solo puede iniciarse la siguiente subprueba PENDIENTE en
+        el orden oficial y cuando no haya otra ACTIVA. letraInicial solo aplica a FV y queda registrada.
+        Sin cuerpo. CU-BFA-P05.
+      parameters:
+        - $ref: '#/components/parameters/EvaluacionId'
+        - $ref: '#/components/parameters/CodigoSubprueba'
+      responses:
+        '200':
+          description: Subprueba activa.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SubpruebaActivaResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: EVALUACION_NO_ENCONTRADA o SUBPRUEBA_NO_ENCONTRADA.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: SUBPRUEBA_FUERA_DE_ORDEN, SUBPRUEBA_CERRADA, HAY_SUBPRUEBA_ACTIVA o LETRA_NO_CONFIGURADA.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/evaluaciones/{evaluacionId}/subpruebas/{codigo}/preguntas:
+    get:
+      tags: [Evaluaciones]
+      operationId: consultarPreguntas
+      summary: E6 — Consultar las preguntas de la subprueba activa
+      description: >-
+        Devuelve las preguntas con sus opciones y la respuesta ya marcada, nunca la clave correcta. Para
+        FV devuelve las palabras ya registradas con su orden. Si la subprueba usa imágenes, el enunciado
+        o la opción incluyen recursoUrl versionado. CU-BFA-P05, CU-BFA-P06.
+      parameters:
+        - $ref: '#/components/parameters/EvaluacionId'
+        - $ref: '#/components/parameters/CodigoSubprueba'
+      responses:
+        '200':
+          description: Preguntas de la subprueba.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PreguntasSubpruebaResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: EVALUACION_NO_ENCONTRADA o SUBPRUEBA_NO_ENCONTRADA.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: SUBPRUEBA_NO_ACTIVA.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/evaluaciones/{evaluacionId}/subpruebas/{codigo}/respuestas:
+    put:
+      tags: [Evaluaciones]
+      operationId: registrarRespuestas
+      summary: E7 — Registrar o cambiar respuestas
+      description: >-
+        Registra o reemplaza respuestas mientras la subprueba esté ACTIVA. Es idempotente. Selección
+        envía respuestas (preguntaId y opcion); FV envía palabras (ordenEntrada y texto), con texto original no
+        vacío, ordenEntrada único y hasta maximoEntradas. Valida estructura, capacidad y plazo, sin decidir la
+        validez léxica. CU-BFA-P06.
+      parameters:
+        - $ref: '#/components/parameters/EvaluacionId'
+        - $ref: '#/components/parameters/CodigoSubprueba'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegistrarRespuestasRequest' }
+            examples:
+              seleccion:
+                value: { respuestas: [ { preguntaId: 120, opcion: B }, { preguntaId: 121, opcion: E } ] }
+              fluidezVerbal:
+                value: { palabras: [ { ordenEntrada: 1, texto: mesa }, { ordenEntrada: 2, texto: montaña } ] }
+      responses:
+        '200':
+          description: Avance de la subprueba.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AvanceSubpruebaResponse' }
+        '400': { $ref: '#/components/responses/SolicitudInvalida' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: La evaluación o la subprueba no existe.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: SUBPRUEBA_NO_ACTIVA; TIEMPO_AGOTADO (llegó después de finLimite).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: RESPUESTA_INVALIDA — la opción no pertenece a la pregunta o la pregunta no es de la edición aplicada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/evaluaciones/{evaluacionId}/finalizar:
+    post:
+      tags: [Evaluaciones]
+      operationId: finalizarEvaluacion
+      summary: E8 — Finalizar la evaluación y consolidar resultados
+      description: >-
+        Consolida factores, compuestos y percentiles a partir de los puntajes de cada subprueba, con
+        versiones exactas de reglas, clave y baremo. Si faltan decisiones FV o insumos aprobados, el
+        resultado queda PENDIENTE_VALIDACION sin convertir faltantes en cero. Repetir la finalización
+        devuelve el cierre existente sin otro cálculo. La publicación va aparte (E12). CU-BFA-P07, CU-BFA-P08.
+      parameters:
+        - $ref: '#/components/parameters/EvaluacionId'
+      responses:
+        '200':
+          description: Evaluación FINALIZADA, con resultadoId y estadoResultado.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EvaluacionResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: EVALUACION_NO_ENCONTRADA.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: SUBPRUEBAS_PENDIENTES — hay ejecuciones incluidas sin cerrar.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/evaluaciones/{evaluacionId}/resultados:
+    get:
+      tags: [Evaluaciones]
+      operationId: consultarResultados
+      summary: E9 — Consultar resultados autorizados
+      description: >-
+        Devuelve el contenedor de resultados y la revisión vigente exacta de una evaluación finalizada.
+        Sin revisión publicada, calificacionId y revision son nulos, factores está vacío y
+        estadoResultado es CALCULANDO o PENDIENTE_VALIDACION. Nunca entrega el contenido de la clave.
+        CU-BFA-P09.
+      parameters:
+        - $ref: '#/components/parameters/EvaluacionId'
+      responses:
+        '200':
+          description: Resultado de la evaluación.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ResultadoResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: EVALUACION_NO_ENCONTRADA.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: EVALUACION_NO_FINALIZADA.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/evaluaciones/{evaluacionId}/calificaciones/{calificacionId}/palabras/{respuestaId}/revision:
+    put:
+      tags: [Revisión y publicación]
+      operationId: revisarPalabra
+      summary: E10 — Registrar la decisión sobre una palabra de Fluidez Verbal
+      description: >-
+        Permiso: Psicólogo. Audita actor y cambio; repetir una misma decisión no duplica la pareja
+        calificación-respuesta. No modifica el texto original ni publica. La identidad del actor sale del
+        contexto autenticado. CU-BFA-P10.
+      parameters:
+        - $ref: '#/components/parameters/EvaluacionId'
+        - $ref: '#/components/parameters/CalificacionId'
+        - name: respuestaId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RevisionPalabraRequest' }
+      responses:
+        '200':
+          description: Decisión registrada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RevisionPalabraResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: Recurso inexistente.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: La revisión ya se completó; se solicita E11.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: La respuesta no es FV o no pertenece a la misma evaluación o calificación.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/evaluaciones/{evaluacionId}/recalculos:
+    post:
+      tags: [Revisión y publicación]
+      operationId: recalcular
+      summary: E11 — Crear una nueva revisión del cálculo
+      description: >-
+        Permiso: Psicólogo. Crea una revisión con motivo y versiones exactas; reenviar la misma solicitud
+        devuelve la misma revisión. La revisión vigente anterior no cambia. CU-BFA-P11.
+      parameters:
+        - $ref: '#/components/parameters/EvaluacionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RecalculoRequest' }
+      responses:
+        '201':
+          description: Revisión creada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RecalculoResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: Recurso inexistente.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: Conflicto de estado o revisión.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: Insumos inexistentes, no aprobados o incompatibles con la edición aplicada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/evaluaciones/{evaluacionId}/resultados/vigente:
+    put:
+      tags: [Revisión y publicación]
+      operationId: publicarRevision
+      summary: E12 — Publicar una revisión como resultado vigente
+      description: >-
+        Permiso: Psicólogo o Coordinador. Publica una revisión completada y validada del mismo Resultado,
+        en una transacción que comprueba la revisión esperada. Repetir la publicación ya efectuada
+        devuelve el estado vigente sin duplicar el cambio. CU-BFA-P12.
+      parameters:
+        - $ref: '#/components/parameters/EvaluacionId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PublicarRevisionRequest' }
+      responses:
+        '200':
+          description: Revisión publicada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PublicacionResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: Recurso inexistente.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: REVISION_VIGENTE_CAMBIO (la vigente cambió) o REVISION_NO_PUBLICABLE (la candidata no está validada).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/auth/registro:
+    post:
+      tags: [Acceso]
+      operationId: registrarCuenta
+      summary: E13 — Crear una cuenta
+      description: >-
+        Crea una cuenta con su perfil básico y el rol permitido. Un rol distinto de SUJETO solo se acepta
+        si quien registra tiene permiso para darlo. Nunca devuelve la contraseña. CU-GEN-01.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegistroRequest' }
+      responses:
+        '201':
+          description: Cuenta creada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CuentaResponse' }
+        '400': { $ref: '#/components/responses/SolicitudInvalida' }
+        '403':
+          description: ROL_NO_AUTORIZADO — se pidió un rol sin permiso para asignarlo.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '409':
+          description: CUENTA_EXISTENTE — el correo ya tiene cuenta; no se crea otra.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/auth/sesion:
+    post:
+      tags: [Acceso]
+      operationId: iniciarSesion
+      summary: E14 — Abrir una sesión
+      description: >-
+        Abre una sesión con el rol activo de la cuenta. Volver a autenticarse durante una evaluación no
+        reinicia su reloj. Las demás llamadas envían Authorization Bearer con el token. CU-GEN-02.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/InicioSesionRequest' }
+      responses:
+        '200':
+          description: Sesión abierta.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SesionResponse' }
+        '400': { $ref: '#/components/responses/SolicitudInvalida' }
+        '401':
+          description: >-
+            CREDENCIALES_INVALIDAS — correo o contraseña incorrectos, o cuenta inhabilitada; el mensaje es
+            el mismo en ambos casos y no muestra datos protegidos.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+    delete:
+      tags: [Acceso]
+      operationId: cerrarSesion
+      summary: E15 — Cerrar la sesión actual
+      description: El token deja de ser válido. Las evaluaciones en curso conservan su estado y su plazo. CU-GEN-02.
+      responses:
+        '204':
+          description: Sesión cerrada, sin cuerpo.
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/auth/recuperacion:
+    post:
+      tags: [Acceso]
+      operationId: pedirRecuperacion
+      summary: E16 — Pedir la recuperación de la contraseña
+      description: >-
+        Pide un enlace o token de un solo uso. Responde igual exista o no la cuenta; si existe, el
+        servicio de correo envía el enlace. CU-GEN-03.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RecuperacionRequest' }
+      responses:
+        '202':
+          description: Solicitud aceptada, sin cuerpo.
+        '400': { $ref: '#/components/responses/SolicitudInvalida' }
+        '503':
+          description: CORREO_NO_DISPONIBLE — el correo no se pudo enviar; se registra la incidencia y se puede volver a pedir.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/auth/recuperacion/confirmar:
+    post:
+      tags: [Acceso]
+      operationId: confirmarRecuperacion
+      summary: E17 — Cambiar la contraseña con el token recibido
+      description: La contraseña queda actualizada y el token inutilizado; después se inicia sesión con E14. CU-GEN-03.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ConfirmarRecuperacionRequest' }
+      responses:
+        '204':
+          description: Contraseña actualizada, sin cuerpo.
+        '400':
+          description: >-
+            SOLICITUD_INVALIDA (la nueva contraseña no cumple la política) o TOKEN_INVALIDO (vencido, ya
+            usado o inexistente; se puede pedir otro con E16).
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/sujetos:
+    post:
+      tags: [Sujetos y periodos]
+      operationId: registrarSujeto
+      summary: E18 — Registrar a la persona evaluada
+      description: >-
+        No crea cuenta de usuario ni abre una evaluación. fechaNacimiento solo cuando la aplicación la
+        requiere. Permiso SUJETO_CREAR. CU-GEN-20.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SujetoRequest' }
+      responses:
+        '201':
+          description: Sujeto registrado.
+          headers:
+            Location:
+              description: /api/v1/sujetos/{sujetoId}
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SujetoResponse' }
+        '400': { $ref: '#/components/responses/SolicitudInvalida' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '409':
+          description: SUJETO_DUPLICADO — ya existe ese identificador institucional; no se crea otro registro.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+    get:
+      tags: [Sujetos y periodos]
+      operationId: buscarSujeto
+      summary: E23 — Buscar un Sujeto por identificador institucional
+      description: Devuelve 0 o 1 elemento. CU-GEN-20. Permiso SUJETO_LEER.
+      parameters:
+        - { name: identificadorInstitucional, in: query, required: true, schema: { type: string }, example: 2026-0153 }
+      responses:
+        '200':
+          description: Sujetos encontrados (0 o 1).
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 1
+                items: { $ref: '#/components/schemas/SujetoResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/sujetos/{sujetoId}:
+    get:
+      tags: [Sujetos y periodos]
+      operationId: consultarSujeto
+      summary: E19 — Consultar un Sujeto
+      description: >-
+        Devuelve los datos autorizados; una consulta nunca crea el registro. Al Decano solo se le devuelve
+        la identificación institucional autorizada. Permiso SUJETO_LEER. CU-GEN-20.
+      parameters:
+        - name: sujetoId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Sujeto.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/SujetoResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: SUJETO_NO_ENCONTRADO.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/periodos:
+    post:
+      tags: [Sujetos y periodos]
+      operationId: crearPeriodo
+      summary: E20 — Crear un Periodo
+      description: Crea un Periodo para nuevas asignaciones. Permiso PERIODO_CREAR. CU-GEN-20.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PeriodoRequest' }
+      responses:
+        '201':
+          description: Periodo creado.
+          headers:
+            Location:
+              description: /api/v1/periodos/{periodoId}
+              schema: { type: string }
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PeriodoResponse' }
+        '400': { $ref: '#/components/responses/SolicitudInvalida' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '409':
+          description: PERIODO_DUPLICADO — ya existe ese código.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: PERIODO_INVALIDO — el inicio es posterior al fin.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+    get:
+      tags: [Sujetos y periodos]
+      operationId: listarPeriodos
+      summary: E21 — Listar los Periodos autorizados
+      description: >-
+        Con disponible=true, solo los que admiten nuevas asignaciones (los que usa E3). Lista vacía si no
+        hay Periodos autorizados. Permiso PERIODO_LEER. CU-GEN-20.
+      parameters:
+        - name: disponible
+          in: query
+          required: false
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Periodos autorizados.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PeriodoResponse' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/tests/{testId}/versiones:
+    post:
+      tags: [Configuración del test]
+      operationId: crearVersionFormulario
+      summary: E25 — Crear una versión en borrador
+      description: Crea una VersionFormulario en BORRADOR a partir de la última PUBLICADA. CU-GEN-05. Permiso CONFIGURAR_BFA.
+      parameters:
+        - $ref: '#/components/parameters/TestId'
+      responses:
+        '201':
+          description: Versión creada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VersionFormularioResponse' }
+              example: { id: 11, testId: 1, estado: BORRADOR }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '404':
+          description: TEST_NO_ENCONTRADO.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/versiones/{versionFormularioId}/configuraciones/{codigo}:
+    put:
+      tags: [Configuración del test]
+      operationId: guardarConfiguracionSubprueba
+      summary: E26 — Definir la configuración de una subprueba
+      description: >-
+        Define la ConfiguracionSubprueba de una versión en BORRADOR. CU-GEN-05, CU-GEN-08. Permisos
+        CONFIGURAR_BFA e INSTRUCCIONES_EDITAR.
+      parameters:
+        - $ref: '#/components/parameters/VersionFormularioId'
+        - $ref: '#/components/parameters/CodigoSubprueba'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ConfiguracionSubpruebaRequest' }
+      responses:
+        '200':
+          description: Configuración guardada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ConfiguracionSubpruebaRequest' }
+        '400': { $ref: '#/components/responses/SolicitudInvalida' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '409':
+          description: VERSION_NO_EDITABLE — la versión no está en BORRADOR.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/versiones/{versionFormularioId}/configuraciones/{codigo}/preguntas:
+    post:
+      tags: [Configuración del test]
+      operationId: agregarPregunta
+      summary: E27 — Agregar una pregunta
+      description: CU-GEN-06. Permiso CONTENIDO_EDITAR.
+      parameters:
+        - $ref: '#/components/parameters/VersionFormularioId'
+        - $ref: '#/components/parameters/CodigoSubprueba'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PreguntaRequest' }
+      responses:
+        '201':
+          description: Pregunta creada, con su id.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PreguntaResponse' }
+        '400': { $ref: '#/components/responses/SolicitudInvalida' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '409':
+          description: VERSION_NO_EDITABLE — la versión no está en BORRADOR.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: PREGUNTA_DUPLICADA — número u orden ya usados en la configuración.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/versiones/{versionFormularioId}/preguntas/{preguntaId}/opciones:
+    put:
+      tags: [Configuración del test]
+      operationId: guardarOpciones
+      summary: E28 — Definir las opciones de una pregunta cerrada
+      description: Define las OpcionRespuesta (letra y texto). CU-GEN-07. Permiso OPCIONES_EDITAR.
+      parameters:
+        - $ref: '#/components/parameters/VersionFormularioId'
+        - name: preguntaId
+          in: path
+          required: true
+          schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/OpcionesRequest' }
+      responses:
+        '200':
+          description: Opciones guardadas.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/OpcionesRequest' }
+        '400': { $ref: '#/components/responses/SolicitudInvalida' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '409':
+          description: VERSION_NO_EDITABLE — la versión no está en BORRADOR.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/versiones/{versionFormularioId}/clave:
+    put:
+      tags: [Configuración del test]
+      operationId: cargarClave
+      summary: E29 — Cargar la clave de respuestas
+      description: >-
+        Carga la VersionClaveBFA con sus EntradaClaveBFA. La clave nunca se devuelve en E2, E6 ni E9.
+        CU-GEN-07. Permiso OPCIONES_EDITAR.
+      parameters:
+        - $ref: '#/components/parameters/VersionFormularioId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ClaveRequest' }
+      responses:
+        '200':
+          description: Clave cargada.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idClave: { type: integer, format: int64, example: 4 }
+        '400': { $ref: '#/components/responses/SolicitudInvalida' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '409':
+          description: VERSION_NO_EDITABLE — la versión no está en BORRADOR.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/baremos:
+    post:
+      tags: [Configuración del test]
+      operationId: cargarBaremo
+      summary: E30 — Cargar un baremo
+      description: Carga un BaremoBFA con sus RangoBaremoBFA. CU-GEN-05, CU-GEN-18. Permiso CONFIGURAR_BFA.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BaremoRequest' }
+      responses:
+        '201':
+          description: Baremo cargado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  idBaremo: { type: integer, format: int64, example: 2 }
+        '400': { $ref: '#/components/responses/SolicitudInvalida' }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '422':
+          description: BAREMO_INVALIDO — rangos superpuestos o incompletos.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+  /api/v1/versiones/{versionFormularioId}/publicar:
+    post:
+      tags: [Configuración del test]
+      operationId: publicarVersionFormulario
+      summary: E31 — Publicar una versión
+      description: >-
+        Publica la versión si está completa (contenido, instrucciones, clave de cada reactivo cerrado y
+        letra de Fluidez Verbal); las anteriores se conservan para los intentos ya iniciados. Sin cuerpo.
+        CU-GEN-05. Permiso CONFIGURAR_BFA.
+      parameters:
+        - $ref: '#/components/parameters/VersionFormularioId'
+      responses:
+        '200':
+          description: Versión publicada.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/VersionFormularioResponse' }
+              example: { id: 11, estado: PUBLICADA }
+        '401': { $ref: '#/components/responses/NoAutenticado' }
+        '403': { $ref: '#/components/responses/SinPermiso' }
+        '409':
+          description: VERSION_NO_EDITABLE — la versión no está en BORRADOR.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '422':
+          description: VERSION_INCOMPLETA — falta contenido, instrucciones, clave o letra de Fluidez Verbal.
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '500': { $ref: '#/components/responses/ErrorInterno' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Token emitido por E14.
+
+  parameters:
+    TestId:
+      name: testId
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+    EvaluacionId:
+      name: evaluacionId
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+    CodigoSubprueba:
+      name: codigo
+      in: path
+      required: true
+      description: Código de la subprueba (VOC1, VOC2, S1, S2, S1b, R1, R2, CV, N1-A, N1-B, N2-A, N2-B, FV).
+      schema: { type: string }
+    VersionFormularioId:
+      name: versionFormularioId
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+    CalificacionId:
+      name: calificacionId
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+
+  responses:
+    SolicitudInvalida:
+      description: SOLICITUD_INVALIDA — JSON mal formado, campo obligatorio ausente o tipo incorrecto; incluye detalles.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    NoAutenticado:
+      description: NO_AUTENTICADO — no hay sesión válida.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    SinPermiso:
+      description: SIN_PERMISO — sin rol activo, permiso o alcance sobre el recurso.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    ErrorInterno:
+      description: ERROR_INTERNO — error no previsto; nunca expone detalles internos.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  schemas:
+    ErrorResponse:
+      description: Formato común de error (Documento general §5.2.2). Una ruta inexistente responde 404 RUTA_NO_ENCONTRADA.
+      type: object
+      required: [timestamp, status, codigo, mensaje, ruta]
+      properties:
+        timestamp: { type: string, format: date-time, example: '2026-10-28T15:30:00Z' }
+        status: { type: integer, example: 422 }
+        codigo: { type: string, description: Estable; el frontend decide por él., example: OPCION_NO_PERTENECE }
+        mensaje: { type: string, description: Para mostrar., example: La opción 87 no pertenece a la pregunta 12. }
+        ruta: { type: string, example: /api/v1/evaluaciones/15/respuestas }
+        detalles:
+          type: array
+          description: Solo en errores de validación.
+          items:
+            type: object
+            properties:
+              campo: { type: string, example: 'respuestas[0].opcionId' }
+              mensaje: { type: string, example: no pertenece a la pregunta }
+
+    TestResumenResponse:
+      type: object
+      properties:
+        id: { type: integer, format: int64, example: 1 }
+        codigo: { type: string, example: BFA }
+        nombre: { type: string, example: Batería Factorial de Aptitudes }
+        numeroSubpruebas: { type: integer, example: 13 }
+
+    TestDetalleResponse:
+      type: object
+      properties:
+        id: { type: integer, format: int64, example: 1 }
+        codigo: { type: string, example: BFA }
+        nombre: { type: string, example: Batería Factorial de Aptitudes }
+        versionFormularioId: { type: integer, format: int64, description: Edición publicada que se aplicará., example: 10 }
+        subpruebas:
+          type: array
+          items: { $ref: '#/components/schemas/ConfiguracionSubprueba' }
+
+    ConfiguracionSubprueba:
+      type: object
+      properties:
+        codigo: { type: string, example: VOC1 }
+        nombre: { type: string, example: Vocabulario - Forma A }
+        orden: { type: integer, example: 1 }
+        factor: { type: string, example: VOC1 }
+        tiempoLimiteSegundos: { type: integer, example: 300 }
+        tipoRespuesta: { type: string, enum: [SELECCION, TEXTO_LIBRE], example: SELECCION }
+        opciones: { type: integer, nullable: true, example: 5 }
+        numeroPreguntas: { type: integer, example: 37 }
+        maximoEntradas: { type: integer, nullable: true, example: null }
+        tienePractica: { type: boolean, example: true }
+
+    IniciarEvaluacionRequest:
+      type: object
+      required: [versionFormularioId, sujetoId, periodoId]
+      properties:
+        testId: { type: integer, format: int64, description: 'Si se recibe, debe coincidir con la versión.', example: 1 }
+        versionFormularioId: { type: integer, format: int64, example: 10 }
+        sujetoId: { type: integer, format: int64, example: 25 }
+        periodoId: { type: integer, format: int64, example: 3 }
+        subpruebas:
+          type: array
+          description: Si se omite, la aplicación es completa.
+          items: { type: string }
+          example: [VOC1, VOC2, CV]
+        fluidez:
+          type: object
+          description: Obligatorio si la evaluación incluye FV y no existe una asignación previa autorizada.
+          properties:
+            letraInicial: { type: string, example: M }
+
+    EvaluacionResponse:
+      type: object
+      properties:
+        id: { type: integer, format: int64, example: 15 }
+        testId: { type: integer, format: int64, example: 1 }
+        sujetoId: { type: integer, format: int64, example: 25 }
+        periodoId: { type: integer, format: int64, example: 3 }
+        versionFormularioId: { type: integer, format: int64, example: 10 }
+        estado: { type: string, enum: [EN_CURSO, FINALIZADA], example: EN_CURSO }
+        fechaInicio: { type: string, format: date-time, example: '2026-10-30T15:30:00Z' }
+        fechaFin: { type: string, format: date-time, nullable: true, example: null }
+        subpruebaActiva:
+          type: object
+          nullable: true
+          properties:
+            codigo: { type: string, example: VOC2 }
+            finLimite: { type: string, format: date-time, example: '2026-10-30T15:42:10Z' }
+            segundosRestantes: { type: integer, example: 214 }
+        subpruebas:
+          type: array
+          items:
+            type: object
+            properties:
+              codigo: { type: string, example: VOC1 }
+              estado: { type: string, enum: [PENDIENTE, ACTIVA, CERRADA], example: CERRADA }
+        resultadoId: { type: integer, format: int64, nullable: true, description: Lo devuelve E8 al finalizar. }
+        estadoResultado: { type: string, nullable: true, description: Lo devuelve E8 al finalizar (ej. PENDIENTE_VALIDACION). }
+
+    SubpruebaActivaResponse:
+      type: object
+      properties:
+        codigo: { type: string, example: FV }
+        estado: { type: string, example: ACTIVA }
+        inicio: { type: string, format: date-time, example: '2026-10-30T16:40:00Z' }
+        finLimite: { type: string, format: date-time, example: '2026-10-30T16:45:00Z' }
+        segundosRestantes: { type: integer, example: 300 }
+        letraInicial: { type: string, nullable: true, description: Solo FV., example: M }
+
+    PreguntasSubpruebaResponse:
+      type: object
+      properties:
+        codigo: { type: string, example: VOC1 }
+        segundosRestantes: { type: integer, example: 182 }
+        preguntas:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer, format: int64, example: 120 }
+              numero: { type: integer, example: 1 }
+              enunciado: { type: string, example: Texto del reactivo }
+              recursoUrl: { type: string, nullable: true, description: Solo si la subprueba usa imágenes. }
+              opciones:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    letra: { type: string, example: A }
+                    texto: { type: string, example: … }
+                    recursoUrl: { type: string, nullable: true }
+              respuestaActual: { type: string, nullable: true, example: B }
+        palabras:
+          type: array
+          description: Solo FV. Palabras ya registradas con su orden.
+          items: { $ref: '#/components/schemas/PalabraFV' }
+
+    PalabraFV:
+      type: object
+      required: [ordenEntrada, texto]
+      properties:
+        ordenEntrada: { type: integer, example: 1 }
+        texto: { type: string, example: mesa }
+
+    RegistrarRespuestasRequest:
+      type: object
+      description: Selección envía respuestas; FV envía palabras.
+      properties:
+        respuestas:
+          type: array
+          items:
+            type: object
+            required: [preguntaId, opcion]
+            properties:
+              preguntaId: { type: integer, format: int64, example: 120 }
+              opcion: { type: string, description: La letra que devuelve E6., example: B }
+        palabras:
+          type: array
+          items: { $ref: '#/components/schemas/PalabraFV' }
+
+    AvanceSubpruebaResponse:
+      type: object
+      properties:
+        codigo: { type: string, example: VOC1 }
+        registradas: { type: integer, example: 2 }
+        totalRespondidas: { type: integer, example: 18 }
+        segundosRestantes: { type: integer, example: 95 }
+
+    ResultadoResponse:
+      type: object
+      properties:
+        evaluacionId: { type: integer, format: int64 }
+        resultadoId: { type: integer, format: int64 }
+        estadoResultado: { type: string, description: 'Ej. CALCULANDO, PENDIENTE_VALIDACION o DISPONIBLE.' }
+        versionFormularioId: { type: integer, format: int64 }
+        calificacionId: { type: integer, format: int64, nullable: true }
+        revision: { type: integer, nullable: true }
+        versionReglas: { type: string, nullable: true }
+        idClave: { type: integer, format: int64, nullable: true }
+        idBaremo: { type: integer, format: int64, nullable: true }
+        factores:
+          type: array
+          items:
+            type: object
+            properties:
+              codigo: { type: string }
+              puntuacionDirecta: { type: integer, nullable: true, description: Nula si el factor no es calculable. }
+              estadoCalculo: { type: string }
+              percentil: { type: integer, nullable: true, description: Solo con un rango exacto de baremo aprobado compatible. }
+              idRango: { type: integer, format: int64, nullable: true }
+              estadoNormativo: { type: string }
+              motivo: { type: string, nullable: true }
+
+    RevisionPalabraRequest:
+      type: object
+      required: [decision, motivo]
+      properties:
+        decision: { type: string, enum: [VALIDA, INVALIDA, PENDIENTE] }
+        motivo: { type: string }
+
+    RevisionPalabraResponse:
+      type: object
+      properties:
+        idRevisionPalabra: { type: integer, format: int64 }
+        calificacionId: { type: integer, format: int64 }
+        respuestaId: { type: integer, format: int64 }
+        decision: { type: string, enum: [VALIDA, INVALIDA, PENDIENTE] }
+        origenDecision: { type: string, example: REVISION_AUTORIZADA }
+        fechaDecision: { type: string, format: date-time }
+
+    RecalculoRequest:
+      type: object
+      description: >-
+        Motivo, versiones exactas de reglas, clave y baremo, y un identificador técnico de solicitud para
+        evitar duplicados. Los nombres de campo siguen los de E9; idSolicitud está pendiente de
+        confirmar en DOC-05.
+      required: [motivo]
+      properties:
+        motivo: { type: string }
+        versionReglas: { type: string }
+        idClave: { type: integer, format: int64 }
+        idBaremo: { type: integer, format: int64 }
+        idSolicitud: { type: string }
+
+    RecalculoResponse:
+      type: object
+      properties:
+        resultadoId: { type: integer, format: int64 }
+        calificacionId: { type: integer, format: int64 }
+        revision: { type: integer }
+        estadoCalculo: { type: string }
+
+    PublicarRevisionRequest:
+      type: object
+      required: [calificacionId, motivo, audiencia]
+      properties:
+        calificacionId: { type: integer, format: int64 }
+        motivo: { type: string }
+        revisionVigenteEsperada: { type: integer, nullable: true, description: Nula en la primera publicación. }
+        audiencia:
+          type: array
+          description: >-
+            Roles que podrán ver la revisión publicada (DOC-04 §3.6): Sujeto, Académico, Coordinador,
+            Psicólogo o Decano.
+          items: { type: string }
+          example: [SUJETO]
+
+    PublicacionResponse:
+      type: object
+      properties:
+        resultadoId: { type: integer, format: int64 }
+        calificacionId: { type: integer, format: int64 }
+        revision: { type: integer }
+        estadoResultado: { type: string }
+
+    RegistroRequest:
+      type: object
+      required: [correo, contrasena, nombres, apellidos, rol]
+      properties:
+        correo: { type: string, format: email, example: ana@uam.edu.ni }
+        contrasena: { type: string, format: password }
+        nombres: { type: string, example: Ana }
+        apellidos: { type: string, example: Ruiz }
+        rol: { type: string, description: 'Roles: Sujeto, Académico, Coordinador, Psicólogo y Decano.', example: SUJETO }
+
+    CuentaResponse:
+      type: object
+      properties:
+        id: { type: integer, format: int64, example: 7 }
+        correo: { type: string, example: ana@uam.edu.ni }
+        rol: { type: string, example: SUJETO }
+        estado: { type: string, example: ACTIVA }
+
+    InicioSesionRequest:
+      type: object
+      required: [correo, contrasena]
+      properties:
+        correo: { type: string, format: email, example: ana@uam.edu.ni }
+        contrasena: { type: string, format: password }
+
+    SesionResponse:
+      type: object
+      properties:
+        token: { type: string }
+        expiraEn: { type: string, format: date-time, example: '2026-11-04T20:00:00Z' }
+        rolActivo: { type: string, example: SUJETO }
+        permisos:
+          type: array
+          items: { type: string }
+          example: [PRACTICA_REALIZAR]
+
+    RecuperacionRequest:
+      type: object
+      required: [correo]
+      properties:
+        correo: { type: string, format: email, example: ana@uam.edu.ni }
+
+    ConfirmarRecuperacionRequest:
+      type: object
+      required: [token, nuevaContrasena]
+      properties:
+        token: { type: string }
+        nuevaContrasena: { type: string, format: password }
+
+    SujetoRequest:
+      type: object
+      required: [identificadorInstitucional, nombres, apellidos]
+      properties:
+        identificadorInstitucional: { type: string, example: 2026-0153 }
+        nombres: { type: string, example: Ana }
+        apellidos: { type: string, example: Ruiz }
+        fechaNacimiento: { type: string, format: date, description: Solo cuando la aplicación la requiere., example: '2008-05-14' }
+
+    SujetoResponse:
+      type: object
+      properties:
+        id: { type: integer, format: int64, example: 25 }
+        identificadorInstitucional: { type: string, example: 2026-0153 }
+        nombres: { type: string, example: Ana }
+        apellidos: { type: string, example: Ruiz }
+
+    PeriodoRequest:
+      type: object
+      required: [codigo, denominacion, inicio, fin]
+      properties:
+        codigo: { type: string, example: 2026-2 }
+        denominacion: { type: string, example: Segundo semestre 2026 }
+        inicio: { type: string, format: date, example: '2026-08-01' }
+        fin: { type: string, format: date, example: '2026-12-15' }
+
+    PeriodoResponse:
+      type: object
+      properties:
+        id: { type: integer, format: int64, example: 3 }
+        codigo: { type: string, example: 2026-2 }
+        denominacion: { type: string, example: Segundo semestre 2026 }
+        inicio: { type: string, format: date, example: '2026-08-01' }
+        fin: { type: string, format: date, example: '2026-12-15' }
+        disponible: { type: boolean, example: true }
+
+    EjemploPractica:
+      type: object
+      properties:
+        numero: { type: integer, example: 1 }
+        enunciado: { type: string, example: … }
+        opciones:
+          type: array
+          items: { $ref: '#/components/schemas/OpcionRespuesta' }
+        retroalimentacion: { type: string, example: … }
+
+    OpcionRespuesta:
+      type: object
+      required: [letra, texto]
+      properties:
+        letra: { type: string, example: A }
+        texto: { type: string, example: … }
+
+    InstruccionesResponse:
+      type: object
+      properties:
+        codigo: { type: string, example: VOC1 }
+        instrucciones: { type: string, example: … }
+        ejemplos:
+          type: array
+          items: { $ref: '#/components/schemas/EjemploPractica' }
+
+    VersionFormularioResponse:
+      type: object
+      properties:
+        id: { type: integer, format: int64, example: 11 }
+        testId: { type: integer, format: int64, example: 1 }
+        estado: { type: string, enum: [BORRADOR, PUBLICADA, RETIRADA], example: BORRADOR }
+
+    ConfiguracionSubpruebaRequest:
+      type: object
+      properties:
+        orden: { type: integer, example: 1 }
+        tiempoLimiteSegundos: { type: integer, example: 300 }
+        tipoRespuesta: { type: string, enum: [SELECCION, TEXTO_LIBRE], example: SELECCION }
+        opciones: { type: integer, nullable: true, example: 5 }
+        maximoEntradas: { type: integer, nullable: true, example: null }
+        tienePractica: { type: boolean, example: true }
+        instrucciones: { type: string, example: … }
+        ejemplos:
+          type: array
+          items: { $ref: '#/components/schemas/EjemploPractica' }
+
+    PreguntaRequest:
+      type: object
+      required: [numeroVisible, ordenPresentacion, enunciado]
+      properties:
+        numeroVisible: { type: integer, example: 1 }
+        ordenPresentacion: { type: integer, example: 1 }
+        enunciado: { type: string, example: Texto del reactivo }
+        recursoRef: { type: string, nullable: true, description: Solo si la pregunta usa imagen. }
+
+    PreguntaResponse:
+      allOf:
+        - type: object
+          properties:
+            id: { type: integer, format: int64, example: 120 }
+        - $ref: '#/components/schemas/PreguntaRequest'
+
+    OpcionesRequest:
+      type: object
+      required: [opciones]
+      properties:
+        opciones:
+          type: array
+          items: { $ref: '#/components/schemas/OpcionRespuesta' }
+
+    ClaveRequest:
+      type: object
+      required: [entradas]
+      properties:
+        entradas:
+          type: array
+          description: Una EntradaClaveBFA por reactivo cerrado; la opción debe pertenecer a la misma pregunta.
+          items:
+            type: object
+            required: [preguntaId, opcion]
+            properties:
+              preguntaId: { type: integer, format: int64, example: 120 }
+              opcion: { type: string, description: Letra de la opción correcta., example: B }
+
+    BaremoRequest:
+      type: object
+      required: [nombre, version, anioNorma, rangos]
+      properties:
+        nombre: { type: string }
+        version: { type: string }
+        anioNorma: { type: integer, example: 1992 }
+        poblacionReferencia: { type: string }
+        referenciaFuente: { type: string }
+        rangos:
+          type: array
+          description: RangoBaremoBFA por factor y percentil; sin superposiciones en un mismo factor.
+          items:
+            type: object
+            required: [idFactor, percentil, estadoCelda]
+            properties:
+              idFactor: { type: string, description: 'Código del factor, como en E9.', example: VOC1 }
+              percentil: { type: integer, minimum: 1, maximum: 99 }
+              limiteInferior: { type: integer, nullable: true, description: Obligatorio si estadoCelda es RANGO. }
+              limiteSuperior: { type: integer, nullable: true }
+              estadoCelda: { type: string, enum: [RANGO, SIN_DATO] }
+              valorOriginal: { type: string }
+              localizadorFuente: { type: string }
