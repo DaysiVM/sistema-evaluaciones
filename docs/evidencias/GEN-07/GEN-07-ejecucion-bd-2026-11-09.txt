@@ -1,0 +1,44 @@
+Ejecución: 2026-11-09 21:41 (America/Managua)
+Servidor: PostgreSQL 16.15 (Ubuntu 16.15-0ubuntu0.24.04.1) on x86_64-pc-linux-gnu, compiled by gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, 64-bit
+Código probado: pull/23/merge bb03b31 (PR #23 head 69c7312 + main f0348c2)
+Migración: database/migrations/V202611040249__comun_catalogo_versionado.sql (md5 6e6d2a1197a4)
+
+      id       | estado |                      esperado                       |                                                     obtenido
+---------------+--------+-----------------------------------------------------+-------------------------------------------------------------------------------------------------------------------
+ TC-GEN-07-001 | PASÓ   | aceptado                                            | aceptado
+ TC-GEN-07-002 | PASÓ   | rechazo: uq_version_test_codigo                     | rechazo: duplicate key value violates unique constraint "uq_version_test_codigo"
+ TC-GEN-07-003 | PASÓ   | rechazo: necesita configuraciones                   | rechazo: Una version necesita configuraciones para publicarse
+ TC-GEN-07-004 | PASÓ   | rechazo: chk_version_publicacion                    | rechazo: new row for relation "version_formulario" violates check constraint "chk_version_publicacion"
+ TC-GEN-07-005 | PASÓ   | aceptado                                            | aceptado
+ TC-GEN-07-006 | PASÓ   | rechazo: publicada o retirada                       | rechazo: No se puede modificar una version publicada o retirada
+ TC-GEN-07-007 | PASÓ   | rechazo: publicada o retirada                       | rechazo: No se puede modificar una version publicada o retirada
+ TC-GEN-07-008 | PASÓ   | rechazo: publicada o retirada                       | rechazo: No se puede modificar una version publicada o retirada
+ TC-GEN-07-009 | PASÓ   | rechazo: publicada o retirada                       | rechazo: No se puede modificar una version publicada o retirada
+ TC-GEN-07-010 | PASÓ   | rechazo: inmutable                                  | rechazo: El contenido de una version publicada es inmutable
+ TC-GEN-07-011 | PASÓ   | rechazo: No se puede eliminar                       | rechazo: No se puede eliminar una version publicada o retirada
+ TC-GEN-07-012 | PASÓ   | rechazo: Transicion de estado no permitida          | rechazo: Transicion de estado no permitida
+ TC-GEN-07-013 | PASÓ   | rechazo: subprueba utilizada                        | rechazo: No se puede redefinir una subprueba utilizada en versiones publicadas
+ TC-GEN-07-014 | PASÓ   | rechazo: publicada o retirada                       | rechazo: No se puede modificar una version publicada o retirada
+ TC-GEN-07-015 | PASÓ   | aceptado                                            | aceptado
+ TC-GEN-07-016 | PASÓ   | contenido de V1 idéntico tras publicar V2           | idéntico (md5 5203bb40)
+ TC-GEN-07-017 | PASÓ   | aceptado                                            | aceptado
+ TC-GEN-07-018 | PASÓ   | RETIRADA conserva publicada_en y su contenido       | publicada_en=conservada, preguntas=2
+ TC-GEN-07-019 | PASÓ   | rechazo: No se puede modificar una version retirada | rechazo: No se puede modificar una version retirada
+ TC-GEN-07-020 | PASÓ   | rechazo: no pertenece al mismo test                 | rechazo: La subprueba no pertenece al mismo test que la version
+ TC-GEN-07-021 | PASÓ   | rechazo: no pertenece al mismo test                 | rechazo: La subprueba no pertenece al mismo test que la version
+ TC-GEN-07-022 | PASÓ   | rechazo: solo pertenecen a preguntas de seleccion   | rechazo: Las opciones solo pertenecen a preguntas de seleccion
+ TC-GEN-07-023 | PASÓ   | rechazo: publicada o retirada                       | rechazo: No se puede modificar una version publicada o retirada
+ TC-GEN-07-024 | PASÓ   | rechazo: uq_config_version_orden                    | rechazo: duplicate key value violates unique constraint "uq_config_version_orden"
+ TC-GEN-07-025 | PASÓ   | rechazo: chk_config_tiempo                          | rechazo: new row for relation "configuracion_subprueba" violates check constraint "chk_config_tiempo"
+ TC-GEN-07-026 | PASÓ   | rechazo: chk_config_tipo                            | rechazo: new row for relation "configuracion_subprueba" violates check constraint "chk_config_tipo"
+ TC-GEN-07-027 | PASÓ   | rechazo: chk_config_entradas_seleccion              | rechazo: new row for relation "configuracion_subprueba" violates check constraint "chk_config_entradas_seleccion"
+ TC-GEN-07-028 | PASÓ   | rechazo: uq_pregunta_numero                         | rechazo: duplicate key value violates unique constraint "uq_pregunta_numero"
+ TC-GEN-07-029 | PASÓ   | rechazo: chk_pregunta_contenido                     | rechazo: new row for relation "pregunta" violates check constraint "chk_pregunta_contenido"
+ TC-GEN-07-030 | PASÓ   | rechazo: uq_opcion_codigo                           | rechazo: duplicate key value violates unique constraint "uq_opcion_codigo"
+ TC-GEN-07-031 | FALLÓ  | rechazo: necesita configuraciones                   | ACEPTADO (sin error)
+(31 rows)
+ estado | count
+--------+-------
+ FALLÓ  |     1
+ PASÓ   |    30
+(2 rows)

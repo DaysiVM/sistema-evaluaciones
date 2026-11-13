@@ -4,6 +4,7 @@ import { Plantilla } from './components/Plantilla';
 import { BfaFe06Preview } from './dev/BfaFe06Preview';
 import { Ui01Preview } from './dev/Ui01Preview';
 import { Ui04Preview } from './dev/Ui04Preview';
+import { Ui05Preview } from './dev/Ui05Preview';
 import { rutasAcceso } from './features/acceso/rutas';
 import { rutasBfa } from './features/bfa/rutas';
 import { rutasCatalogo } from './features/catalog/rutas';
@@ -28,6 +29,8 @@ const router = createBrowserRouter([
   { path: 'dev/ui-04', element: <Ui04Preview /> },
   // Vista previa de BFA-FE-06: familia Numérico con el mock de E5/E6/E7.
   { path: 'dev/bfa-fe-06', element: <BfaFe06Preview /> },
+  // Vista previa de UI-05: diseño del perfil de resultados BFA (datos simulados).
+  { path: 'dev/ui-05', element: <Ui05Preview /> },
 ]);
 
 export function App() {
