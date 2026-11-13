@@ -1,0 +1,128 @@
+/* Estilos de la consulta de resultados (GEN-05-FE). Usa los tokens de styles.css y las clases ev- de GEN-02. */
+
+.res-consulta,
+.res-vista {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.res-vista h2 {
+  margin: 0.5rem 0 0;
+  font-size: 1.25rem;
+}
+
+.res-aviso {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--test-line);
+  border-left-width: 4px;
+}
+
+.res-aviso p {
+  margin: 0;
+  color: var(--test-secondary);
+}
+
+.res-aviso--exito {
+  border-left-color: #2e7d32;
+}
+.res-aviso--aviso {
+  border-left-color: #b26a00;
+}
+.res-aviso--info {
+  border-left-color: var(--uam-primary);
+}
+.res-aviso--neutro {
+  border-left-color: var(--test-secondary);
+}
+
+.res-insignia {
+  display: inline-block;
+  justify-self: start;
+  padding: 0.15rem 0.55rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+}
+
+.res-insignia--exito {
+  color: #1b5e20;
+  background: #e8f5e9;
+}
+.res-insignia--aviso {
+  color: #7a4a00;
+  background: #fff4e0;
+}
+.res-insignia--info {
+  color: var(--uam-action);
+  background: #e0f4f6;
+}
+.res-insignia--neutro {
+  color: var(--test-secondary);
+  background: var(--test-background);
+}
+
+.res-datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.75rem 1.25rem;
+  margin: 0;
+}
+
+.res-datos dt {
+  font-size: 0.8rem;
+  color: var(--test-secondary);
+}
+
+.res-datos dd {
+  margin: 0.1rem 0 0;
+  font-weight: 600;
+}
+
+.res-tabla-contenedor {
+  overflow-x: auto;
+}
+
+.res-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.res-tabla th,
+.res-tabla td {
+  padding: 0.6rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--test-line);
+}
+
+.res-tabla thead th {
+  font-size: 0.85rem;
+  color: var(--test-secondary);
+  background: var(--test-background);
+}
+
+.res-numero {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.res-fila--sin-dato .res-numero {
+  color: var(--test-secondary);
+}
+
+.res-motivo {
+  max-width: 22rem;
+  color: var(--test-secondary);
+}
+
+.res-vacio {
+  margin: 0;
+  padding: 1rem;
+  color: var(--test-secondary);
+  background: var(--test-background);
+}
