@@ -38,7 +38,7 @@ export const CONFIG_NUMERICO: Record<CodigoNumerico, ConfigNumerica> = {
     respuesta: 'binaria',
     contenido: 'operacion',
     letras: BINARIA,
-    volverAtras: false,
+    volverAtras: true,
     tiempoOficial: '4 minutos',
     instrucciones:
       'Cada suma trae un resultado propuesto. Marca A si es verdadero o B si es falso; al responder pasas a la siguiente. Puedes usar las teclas A o V y B o F.',
@@ -50,7 +50,7 @@ export const CONFIG_NUMERICO: Record<CodigoNumerico, ConfigNumerica> = {
     respuesta: 'binaria',
     contenido: 'operacion',
     letras: BINARIA,
-    volverAtras: false,
+    volverAtras: true,
     tiempoOficial: '4 minutos',
     instrucciones:
       'Cada multiplicación trae un resultado propuesto. Marca A si es verdadero o B si es falso; al responder pasas a la siguiente. Puedes usar las teclas A o V y B o F.',
