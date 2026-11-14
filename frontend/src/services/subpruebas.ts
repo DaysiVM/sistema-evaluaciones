@@ -5,7 +5,7 @@ import { http } from './http';
  * Son comunes a todas las subpruebas: no contienen reglas de ningún test ni claves de corrección.
  */
 
-/** Estados de una subprueba dentro de una evaluación (ENT-COM-06). Sin retroceso en BFA. */
+/** Estados de una subprueba dentro de una evaluación (ENT-COM-06). */
 export type EstadoSubprueba = 'PENDIENTE' | 'ACTIVA' | 'CERRADA';
 
 /** E5 · 200 SubpruebaActivaResponse. */

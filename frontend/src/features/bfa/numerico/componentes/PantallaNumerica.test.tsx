@@ -103,11 +103,12 @@ describe('PantallaNumerica', () => {
     expect(html('N2-A', p, { estadoGuardado: 'error' })).toContain('No se pudo guardar');
   });
 
-  it('solo N2 ofrece volver a la pregunta anterior', async () => {
+  it('todas las subpruebas ofrecen volver a la pregunta anterior (C-1)', async () => {
     const [s] = await preguntasDe('N1-A');
     const [o] = await preguntasDe('N2-A');
-    expect(html('N1-A', s, { indice: 3, onAnterior: nada })).not.toContain('Anterior');
+    expect(html('N1-A', s, { indice: 3, onAnterior: nada })).toContain('Anterior');
     expect(html('N2-A', o, { indice: 3, onAnterior: nada })).toContain('Anterior');
+    expect(html('N1-A', s, { indice: 0, onAnterior: nada })).not.toContain('Anterior');
     expect(html('N2-A', o, { indice: 0, onAnterior: nada })).not.toContain('Anterior');
   });
 
@@ -156,9 +157,9 @@ describe('fin de la subprueba y espera', () => {
     expect(marcado).not.toContain('radiogroup');
   });
 
-  it('solo N2 permite volver a revisar desde la espera', () => {
+  it('todas las subpruebas permiten volver a revisar desde la espera (C-1)', () => {
     const conRevision = { fase: 'espera' as const, onRevisar: nada };
-    expect(html('N1-B', undefined, conRevision)).not.toContain('Volver a revisar');
+    expect(html('N1-B', undefined, conRevision)).toContain('Volver a revisar');
     expect(html('N2-B', undefined, conRevision)).toContain('Volver a revisar');
   });
 });
