@@ -1,4 +1,4 @@
-# Casos de prueba GEN-07 — formularios y preguntas versionados (v1)
+# Casos de prueba GEN-07 — formularios y preguntas versionados (v2)
 
 ## Identificación
 
@@ -6,34 +6,35 @@
 - **Tarea de Desarrollo:** [GEN-07-BE](https://app.clickup.com/t/86bcw9yvz) (PR #23, Max Martínez)
 - **Historia:** [GEN-07](https://app.clickup.com/t/86bcx2z61)
 - **Tester:** José Ariel Zeledón
-- **Versión y fecha:** v1 · 2026-11-09
-- **PR y SHA probados:** #23 · head `69c7312` (`pull/23/merge` `bb03b31` sobre `main` `f0348c2`)
-- **Resultado:** 34 PASÓ · 1 FALLÓ (TC-GEN-07-031) · 13 BLOQUEADO. **Sin `testing-ok`** hasta corregir TC-GEN-07-031 (ver «Defecto encontrado»).
+- **Versión y fecha:** v2 · 2026-11-14
+- **PR y SHA probados:** #23 · head `53f1229` (`pull/23/merge` `84ba292` sobre `main` `15a7479`). Primera ejecución: head `69c7312` (`pull/23/merge` `bb03b31`).
+- **Resultado:** 35 PASÓ · 13 BLOQUEADO. El defecto de TC-GEN-07-031 (BUG-04) quedó corregido y el PR #23 tiene `testing-ok` desde el 2026-11-14 para el SHA `53f1229`.
 
 ## Historial de cambios
 
 | Versión | Fecha | Cambios |
 | --- | --- | --- |
 | v1 | 2026-11-09 | Diseño de 48 casos y primera ejecución sobre el PR #23: 31 casos de base de datos, 4 de revisión de código y del CI (más `mvn verify` en local), y 13 bloqueados (evaluación con versión y API E25–E31). |
+| v2 | 2026-11-14 | Reprueba sobre el PR #23 después de la corrección de BUG-04 (`53f1229`): TC-GEN-07-001 a 035 pasan. TC-GEN-07-031 ahora espera cualquier rechazo (en v1 decía «igual que en TC-003», pero el criterio pide el rechazo y no un mensaje) y agrega los pasos de RETIRADA y BORRADOR. Respuestas a C-1 y C-2. DOC-04 pasó a `completed`. |
 
 ## Fuentes y estado
 
-| Fuente | Estado al 2026-11-09 | Uso en este documento |
+| Fuente | Estado (v1: 2026-11-09 · v2: 2026-11-14) | Uso en este documento |
 | --- | --- | --- |
 | Criterios de aceptación de GEN-07-BE y GEN-07-TEST (ClickUp) | Publicados en las tareas | Base de todos los casos |
 | Documento general §4: ENT-COM-05, 07, 08, 12 y 13 y criterios CA-01 a CA-10 del modelo | **Aprobado** ([DOC-03](https://app.clickup.com/t/86bctt9bt) `completed`) | Restricciones de versiones, configuraciones, preguntas y opciones |
 | Documento general §5.2 (convenciones REST, formato de error, E25–E31) y Documento BFA §5 (E3, ajustes §5.4.1) | **Aprobado** ([DOC-05](https://app.clickup.com/t/86bctt9cy) `completed`) | Casos de API (bloqueados) |
 | Documento general §5.1 (arquitectura y motor común) | **Aprobado** ([DOC-06](https://app.clickup.com/t/86bctt9db) `completed`) | Capas y protección por rol |
 | Documento BFA §2: RNF-BFA-GEN-05 y RNF-BFA-GEN-09 | **Aprobado** ([DOC-02](https://app.clickup.com/t/86bctt9b8) `completed`) | Seguridad y versionado |
-| Documento general §3: §3.1 y CU-GEN-05 a CU-GEN-07 | [DOC-04](https://app.clickup.com/t/86bctt9cm) `in review` | Valores **provisionales (DOC-04)**, marcados en cada caso |
+| Documento general §3: §3.1 y CU-GEN-05 a CU-GEN-07 | [DOC-04](https://app.clickup.com/t/86bctt9cm) `in review` al diseñar la v1; `completed` desde el 2026-11-10 | Valores marcados como **provisionales (DOC-04)** en la v1. El 2026-11-14 se comprobó que el texto citado sigue igual en la versión aprobada. |
 | [DOC-07](https://app.clickup.com/t/86bctt9dn) — Calidad documental | `in progress` | Dependencia de GEN-07-TEST en ClickUp |
 | `docs/api/openapi.yaml` | En `main` sin rutas; E25–E31 se publican en el PR #37 (GEN-00-API), sin fusionar | Referencia |
 
-Los resultados esperados que provienen de documentos aprobados no llevan marca. Los que dependen de DOC-04 se marcan como **provisional (DOC-04)**.
+Los resultados esperados que provienen de documentos aprobados no llevan marca. Los que dependían de DOC-04 se marcaron como **provisional (DOC-04)** en la v1; se deja la marca para saber de dónde salen, pero DOC-04 ya está aprobado.
 
 ## Alcance del PR #23
 
-El PR implementa la **capa de persistencia y los servicios** del contenido versionado: entidades y repositorios de test, subprueba, versión de formulario, configuración, pregunta y opción; servicios de edición, consulta, publicación y retiro; la migración `V202611040249__comun_catalogo_versionado.sql`, cuyos triggers protegen el contenido publicado; un puerto de autorización con un adaptador que deniega todo por defecto; y 24 pruebas automatizadas.
+El PR implementa la **capa de persistencia y los servicios** del contenido versionado: entidades y repositorios de test, subprueba, versión de formulario, configuración, pregunta y opción; servicios de edición, consulta, publicación y retiro; la migración `V202611040249__comun_catalogo_versionado.sql`, cuyos triggers protegen el contenido publicado; un puerto de autorización con un adaptador que deniega todo por defecto; y 24 pruebas automatizadas. Desde el 2026-11-11 agrega la migración `V202611111300__comun_bloquear_estado_inicial_invalido.sql` (corrección de BUG-04) y una prueba más (25 en total). Entre `69c7312` y `53f1229` no cambió ningún archivo de `backend/src/main`.
 
 **No agrega endpoints REST** (lo indica su descripción) **ni crea evaluaciones**. Por eso:
 
@@ -51,7 +52,7 @@ El PR implementa la **capa de persistencia y los servicios** del contenido versi
 | Una evaluación conserva la versión con la que se creó. | TC-GEN-07-036 | BLOQUEADO |
 | Esquemas, códigos HTTP, campos y errores cumplen el contrato aprobado. | TC-GEN-07-040 a 048 | BLOQUEADO |
 | Cada criterio de las subtareas del grupo tiene al menos un caso `TC-`. | Esta matriz | Cumplido |
-| Cada PR del grupo tiene `testing-ok` o sus fallos comentados antes de la fusión. | «Registro de ejecución» y comentario en el PR #23 | Fallo comentado |
+| Cada PR del grupo tiene `testing-ok` o sus fallos comentados antes de la fusión. | «Registro de ejecución» y comentarios en el PR #23 | `testing-ok` (2026-11-14, SHA `53f1229`) |
 
 **GEN-07-BE**
 
@@ -63,7 +64,7 @@ El PR implementa la **capa de persistencia y los servicios** del contenido versi
 | Los cambios en formularios publicados no alteran evaluaciones existentes. | TC-GEN-07-006 a 009, 016 (contenido); TC-GEN-07-037 (evaluación) | PASÓ en contenido · BLOQUEADO en evaluación |
 | Se impide utilizar configuraciones o preguntas incompatibles con la versión seleccionada. | TC-GEN-07-014, 020 a 023; TC-GEN-07-038, 039 | PASÓ en base de datos · BLOQUEADO en E3 |
 | El contenido restringido no se expone a usuarios sin autorización. | TC-GEN-07-034, 042 | PASÓ (código) · BLOQUEADO en API |
-| La implementación cumple el modelo de datos y las reglas de versionado aprobadas. | TC-GEN-07-003, 004, 024 a 031, 033 | **FALLÓ (TC-GEN-07-031)** |
+| La implementación cumple el modelo de datos y las reglas de versionado aprobadas. | TC-GEN-07-003, 004, 024 a 031, 033 | PASÓ (TC-GEN-07-031 corregido en `53f1229`) |
 | Las pruebas automatizadas se ejecutan satisfactoriamente. | TC-GEN-07-032 | PASÓ |
 
 **Criterios del modelo relacionados (Documento general §4.6)**
@@ -79,10 +80,10 @@ Se dejan en la tarea [GEN-07-TEST](https://app.clickup.com/t/86bcx2z6c). Mientra
 
 | ID | Consulta | Para | Casos afectados | Estado |
 | --- | --- | --- | --- | --- |
-| C-1 | GEN-07-TEST pide probar con Postman y verificar el contrato HTTP, pero el PR #23 no tiene endpoints. ¿Qué tarea implementa E25–E31? ¿Se acepta el `testing-ok` del PR #23 con esos casos bloqueados? | Scrum de Testing e Integración | TC-GEN-07-040 a 048 | Abierta |
-| C-2 | «La evaluación conserva su versión» necesita E3 (GEN-02-BE). ¿Se verifica en GEN-02-TEST y en TEST-01-EJEC una vez fusionados ambos? | Scrum de Testing | TC-GEN-07-036 a 039 | Abierta |
-| C-3 | E25 crea la versión «a partir de la última PUBLICADA». ¿Debe copiar su contenido? `crearBorrador` crea un borrador vacío. | Documentación (DOC-05) | TC-GEN-07-040 | Abierta |
-| C-4 | En E3, ¿qué código se devuelve si el `testId` recibido no coincide con el test de `versionFormularioId`: `422 VERSION_INCOMPATIBLE`, `404 TEST_NO_ENCONTRADO` u otro? | Documentación (DOC-05) | TC-GEN-07-039 | Abierta |
+| C-1 | GEN-07-TEST pide probar con Postman y verificar el contrato HTTP, pero el PR #23 no tiene endpoints. ¿Qué tarea implementa E25–E31? ¿Se acepta el `testing-ok` del PR #23 con esos casos bloqueados? | Scrum de Testing e Integración | TC-GEN-07-040 a 048 | **Respondida** (Integración, 2026-11-10): E25–E31 también son de GEN-07-BE y todavía no están implementados; esos casos no pueden pasar mientras no existan. El orden que definió Integración el 2026-11-12 (PR #41) es fusionar el #23 tras la reprueba de BUG-04, así que el `testing-ok` cubre lo que el PR implementa y los 13 casos siguen bloqueados. |
+| C-2 | «La evaluación conserva su versión» necesita E3 (GEN-02-BE). ¿Se verifica en GEN-02-TEST y en TEST-01-EJEC una vez fusionados ambos? | Scrum de Testing | TC-GEN-07-036 a 039 | **Respondida** (Integración, 2026-11-10): sí, se verifica en GEN-02-TEST y TEST-01-EJEC cuando GEN-02-BE y GEN-07-BE estén fusionados. |
+| C-3 | E25 crea la versión «a partir de la última PUBLICADA». ¿Debe copiar su contenido? `crearBorrador` crea un borrador vacío. | Documentación (DOC-05) | TC-GEN-07-040 | Abierta (Integración la pasó a DOC-05 el 2026-11-10) |
+| C-4 | En E3, ¿qué código se devuelve si el `testId` recibido no coincide con el test de `versionFormularioId`: `422 VERSION_INCOMPATIBLE`, `404 TEST_NO_ENCONTRADO` u otro? | Documentación (DOC-05) | TC-GEN-07-039 | Abierta (Integración la pasó a DOC-05 el 2026-11-10) |
 
 ## Datos de prueba (ficticios)
 
@@ -99,7 +100,9 @@ Todos los datos son inventados: no hay ítems reales de pruebas psicológicas ni
 
 ## Entorno
 
-- **Base de datos:** PostgreSQL 16.15 local, base `evaluaciones` vacía. Se aplicó con `psql` la migración del PR (`md5 6e6d2a1197a4`, idéntica en el head y en `pull/23/merge`) y después el script [`docs/evidencias/GEN-07/GEN-07-casos-bd.sql`](../evidencias/GEN-07/GEN-07-casos-bd.sql). Cada caso de rechazo se ejecuta en un bloque que se revierte, así no altera los siguientes.
+- **Base de datos:** PostgreSQL 16.15 local, base vacía. Se aplicaron con `psql` las migraciones del PR y después el script [`docs/evidencias/GEN-07/GEN-07-casos-bd.sql`](../evidencias/GEN-07/GEN-07-casos-bd.sql). Cada caso de rechazo se ejecuta en un bloque que se revierte, así no altera los siguientes.
+  - v1 (2026-11-09): `V202611040249` (`md5 6e6d2a1197a4`) sobre `pull/23/merge` `bb03b31`.
+  - v2 (2026-11-14): `V202611040249` (mismo `md5`) y `V202611111300` (`md5 cf723d3daa2c`) sobre `pull/23/merge` `84ba292`.
 - **Diferencia con el proyecto:** el proyecto usa PostgreSQL 17. La migración no usa nada exclusivo de la versión 17, y las pruebas de integración del CI ya corren en 17 (TC-GEN-07-032). Para repetir en 17: `docker compose up -d db`, aplicar la migración y correr el script.
 - **Backend:** no se levantó como servidor, porque el PR no expone endpoints. Las pruebas automatizadas se ejecutaron en el CI del SHA probado y en local (Windows, IntelliJ IDEA 2026.2.3 con su Maven, JDK 27, PostgreSQL 18.6, base `evaluaciones` vacía). En local se saltó solo la revisión de formato (`-Dspotless.check.skip=true`), porque Windows cambia los saltos de línea; el formato lo valida el CI. Flyway avisa que PostgreSQL 18 es más nuevo que su última versión probada (17); no afectó la migración.
 
@@ -289,7 +292,7 @@ Todos los datos son inventados: no hay ítems reales de pruebas psicológicas ni
 
 | ID | CA cubierto | Datos y precondiciones | Pasos | Resultado esperado | Manual o e2e | Estado |
 | --- | --- | --- | --- | --- | --- | --- |
-| TC-GEN-07-031 | GEN-07-BE: "La implementación cumple el modelo de datos y las reglas de versionado aprobadas."<br>ENT-COM-12: "1..N [configuraciones] al publicarse"; "Publicar exige validación de contenido." | TEST-FICTICIO | 1. Insertar directamente una versión con `estado = PUBLICADA`, fecha y evidencia, sin configuraciones. | Rechazo, igual que en TC-003. | Manual (script SQL) | **FALLÓ** |
+| TC-GEN-07-031 | GEN-07-BE: "La implementación cumple el modelo de datos y las reglas de versionado aprobadas."<br>ENT-COM-12: "1..N [configuraciones] al publicarse"; "Publicar exige validación de contenido." | TEST-FICTICIO | 1. Insertar directamente una versión con `estado = PUBLICADA`, fecha y evidencia, sin configuraciones.<br>2. Lo mismo con `estado = RETIRADA`.<br>3. Insertar una versión nueva en `BORRADOR`. | Pasos 1 y 2: rechazo (no se fija el mensaje). Paso 3: se acepta. | Manual (script SQL) | **PASÓ** (v2). En v1 FALLÓ: ver «Defecto encontrado». |
 
 
 ## Casos — Revisión de código y CI
@@ -298,7 +301,7 @@ Todos los datos son inventados: no hay ítems reales de pruebas psicológicas ni
 
 | ID | CA cubierto | Datos y precondiciones | Pasos | Resultado esperado | Manual o e2e | Estado |
 | --- | --- | --- | --- | --- | --- | --- |
-| TC-GEN-07-032 | GEN-07-BE: "Las pruebas automatizadas se ejecutan satisfactoriamente." | Run de CI [42687147493](https://github.com/Nell16/sistema-evaluaciones/actions/runs/42687147493) sobre `69c7312`; ejecución local sobre `pull/23/merge` `bb03b31` | 1. Revisar el job `backend-build` (`mvn verify` con PostgreSQL 17).<br>2. Ejecutar en local `mvn verify -Dspotless.check.skip=true` sobre `bb03b31` con PostgreSQL 18.6. | CI y local: `Tests run: 24, Failures: 0, Errors: 0, Skipped: 0` y `BUILD SUCCESS`. En local, Flyway aplica la migración `202611040249` sobre una base vacía. | CI y ejecución local | **PASÓ** |
+| TC-GEN-07-032 | GEN-07-BE: "Las pruebas automatizadas se ejecutan satisfactoriamente." | v1: run de CI [42687147493](https://github.com/Nell16/sistema-evaluaciones/actions/runs/42687147493) sobre `69c7312` y ejecución local sobre `pull/23/merge` `bb03b31`. v2: run de CI [43468541738](https://github.com/Nell16/sistema-evaluaciones/actions/runs/43468541738) sobre `53f1229` | 1. Revisar el job `backend-build` (`mvn verify` con PostgreSQL 17).<br>2. (v1) Ejecutar en local `mvn verify -Dspotless.check.skip=true` sobre `bb03b31` con PostgreSQL 18.6. | Sin fallos y `BUILD SUCCESS`. v1: 24 pruebas en CI y en local. v2: 25 pruebas en CI y Flyway aplica las dos migraciones. | CI y ejecución local | **PASÓ** |
 
 ### TC-GEN-07-033 — La publicación valida el contenido
 
@@ -405,9 +408,9 @@ Contrato aprobado del Documento general §5.2.4. En todo error se verifica adem�
 | TC-GEN-07-048 | GEN-07-TEST: "Esquemas, códigos HTTP, campos y errores cumplen el contrato aprobado." | Versión en BORRADOR | 1. `PUT …/configuraciones/{codigo}` con JSON inválido y luego sin `tipoRespuesta`. | `400 SOLICITUD_INVALIDA` con `detalles` por campo. | Manual (Postman) | **BLOQUEADO** |
 
 
-## Defecto encontrado
+## Defecto encontrado (corregido)
 
-**TC-GEN-07-031 — Se puede insertar una versión ya publicada y sin contenido.**
+**TC-GEN-07-031 — Se puede insertar una versión ya publicada y sin contenido.** Registrado como [BUG-04](https://app.clickup.com/t/1k5fzqazaw5) el 2026-11-09. Corregido en el PR #23 con la migración `V202611111300__comun_bloquear_estado_inicial_invalido.sql` (commit `3010e0b`, 2026-11-11), que rechaza un `INSERT` directo en un estado distinto de BORRADOR. Reprobado el 2026-11-14 sobre `53f1229`: pasa. BUG-04 quedó en `completed`.
 
 - **Pasos:** sobre la base con la migración del PR, ejecutar
   `INSERT INTO version_formulario (id_test, codigo_version, fuente_ref, estado, publicada_en, evidencia_validacion) VALUES (1, 'V-DIRECTA', 'Material ficticio', 'PUBLICADA', now(), 'ev-ficticia');`
@@ -416,13 +419,13 @@ Contrato aprobado del Documento general §5.2.4. En todo error se verifica adem�
 - **Alcance:** desde los servicios Java no se alcanza, porque toda versión nueva nace en BORRADOR (TC-GEN-07-035). Sí se alcanza con una carga directa por SQL, que es como puede llegar el contenido autorizado («mecanismo controlado para incorporar contenido»).
 - **Severidad:** media. Rompe una regla del modelo aprobado en la capa que el PR presenta como protección del contenido publicado.
 - **Evidencia:** [`docs/evidencias/GEN-07/GEN-07-ejecucion-bd-2026-11-09.txt`](../evidencias/GEN-07/GEN-07-ejecucion-bd-2026-11-09.txt).
-- **Registro:** comentario en el PR #23 y tarea en la lista Bugs de ClickUp, enlazada a GEN-07-BE. Testing no corrige código; al recibir la corrección se repiten TC-GEN-07-001 a 031.
+- **Registro:** comentario en el PR #23 y tarea en la lista Bugs de ClickUp, enlazada a GEN-07-BE. Testing no corrige código; al recibir la corrección se repitieron TC-GEN-07-001 a 035 (ver «Registro de ejecución»).
 
 ## Observaciones (no bloquean)
 
 | ID | Observación | Dónde |
 | --- | --- | --- |
-| O-1 | La rama del PR #23 está atrasada respecto a `main` (`mergeable_state: behind`). La ruleset exige actualizarla; si cambia la migración o los servicios, se repiten los casos afectados. | PR #23 |
+| O-1 | (v1) La rama del PR #23 estaba atrasada respecto a `main`. Se actualizó el 2026-11-13 (`3fbc2f1`); solo entraron cambios de frontend y docs. | PR #23 |
 | O-2 | `VersionFormularioService.listarPorTest` responde «No existe el test» antes de consultar permisos y, si el test no tiene versiones, devuelve una lista vacía sin pasar por la autorización. No expone contenido, pero sí si un test existe. Ninguna prueba automatizada cubre la denegación de las consultas (solo la de publicar). | `VersionFormularioService` |
 | O-3 | El PR no valida la cantidad de opciones ni de claves por módulo (CU-GEN-07, provisional DOC-04: A–E, A–D, A–C, A/B). Son reglas del módulo BFA, fuera del motor común; se anotan para BFA-TEST-01. | CU-GEN-07 |
 
@@ -432,12 +435,13 @@ Contrato aprobado del Documento general §5.2.4. En todo error se verifica adem�
 | --- | --- | --- | --- | --- |
 | 2026-11-09 | #23 / `69c7312` (`pull/23/merge` `bb03b31`) | José Ariel Zeledón | Base de datos: 30 PASÓ, 1 FALLÓ (TC-GEN-07-031). Código y CI: 4 PASÓ. Bloqueados: 13. | [Script](../evidencias/GEN-07/GEN-07-casos-bd.sql) · [salida](../evidencias/GEN-07/GEN-07-ejecucion-bd-2026-11-09.txt) · [CI 42687147493](https://github.com/Nell16/sistema-evaluaciones/actions/runs/42687147493) · defecto TC-GEN-07-031 |
 | 2026-11-09 | #23 / `pull/23/merge` `bb03b31` | José Ariel Zeledón | `mvn verify` local (PostgreSQL 18.6, JDK 27): 24/24 pruebas, `BUILD SUCCESS` (TC-GEN-07-032). | [salida resumida](../evidencias/GEN-07/GEN-07-mvn-verify-local-2026-11-09.txt) |
+| 2026-11-14 | #23 / `53f1229` (`pull/23/merge` `84ba292`) | José Ariel Zeledón | Reprueba tras BUG-04. Base de datos: TC-GEN-07-001 a 031 PASÓ. Código y CI: TC-GEN-07-032 a 035 PASÓ (sin cambios en `backend/src/main` desde `69c7312`; CI 25/25). Bloqueados: 13. `testing-ok` puesto en el PR #23. | [Script v2](../evidencias/GEN-07/GEN-07-casos-bd.sql) · [salida](../evidencias/GEN-07/GEN-07-ejecucion-bd-2026-11-14.txt) · [CI 43468541738](https://github.com/Nell16/sistema-evaluaciones/actions/runs/43468541738) · BUG-04 cerrado |
 
 ### Revisión final
 
 - [x] Cada caso corresponde a un criterio aprobado y a la tarea correcta.
-- [x] Se ejecutó contra el commit vigente del PR (`69c7312`).
+- [x] Se ejecutó contra el commit vigente del PR (`53f1229`; antes `69c7312`).
 - [x] Se registraron resultados reales y evidencia verificable.
 - [x] No contiene secretos ni datos personales reales.
-- [ ] Se comentó al PR, se registró en Bugs y se informó a Integración.
-- [ ] Solo después de aprobar, se colocó o solicitó `testing-ok` cuando corresponde.
+- [x] Se comentó al PR, se registró en Bugs y se informó a Integración.
+- [x] Solo después de aprobar, se colocó o solicitó `testing-ok` cuando corresponde.

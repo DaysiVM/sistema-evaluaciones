@@ -1,10 +1,11 @@
--- Casos de prueba de base de datos GEN-07 (PR #23, migración V202611040249)
+-- Casos de prueba de base de datos GEN-07 (PR #23, migraciones V202611040249 y V202611111300)
 -- Datos 100 % ficticios: no son ítems reales de ninguna prueba psicológica.
--- Documento: docs/pruebas/GEN-07-casos-prueba-v1.md (TC-GEN-07-001 a 031)
+-- Documento: docs/pruebas/GEN-07-casos-prueba-v2.md (TC-GEN-07-001 a 031)
 --
 -- Uso, sobre una base VACÍA (nunca la compartida ni la de un entorno desplegado):
 --   createdb evaluaciones_gen07
 --   psql -d evaluaciones_gen07 -f database/migrations/V202611040249__comun_catalogo_versionado.sql
+--   psql -d evaluaciones_gen07 -f database/migrations/V202611111300__comun_bloquear_estado_inicial_invalido.sql
 --   psql -d evaluaciones_gen07 -f docs/evidencias/GEN-07/GEN-07-casos-bd.sql
 -- Al final imprime cada caso con PASÓ / FALLÓ, lo esperado y lo obtenido.
 \set ON_ERROR_STOP 1
@@ -14,7 +15,8 @@ CREATE TEMP TABLE resultado_tc (
   id TEXT PRIMARY KEY, esperado TEXT, obtenido TEXT, estado TEXT
 );
 
--- espera_error: ejecuta la sentencia y comprueba que PostgreSQL la rechace
+-- espera_error: ejecuta la sentencia y comprueba que PostgreSQL la rechace.
+-- Si p_fragmento es '', cualquier rechazo cuenta como PASÓ (el caso no fija un mensaje).
 CREATE FUNCTION pg_temp.espera_error(p_id TEXT, p_sql TEXT, p_fragmento TEXT)
 RETURNS VOID LANGUAGE plpgsql AS $$
 DECLARE v_aceptado BOOLEAN := false; v_error TEXT;
@@ -27,10 +29,12 @@ BEGIN
     v_error := SQLERRM;
   END;
   IF v_aceptado THEN
-    INSERT INTO resultado_tc VALUES (p_id, 'rechazo: ' || p_fragmento, 'ACEPTADO (sin error)', 'FALLÓ');
+    INSERT INTO resultado_tc VALUES (p_id, CASE WHEN p_fragmento = '' THEN 'rechazo' ELSE 'rechazo: ' || p_fragmento END,
+      'ACEPTADO (sin error)', 'FALLÓ');
   ELSE
-    INSERT INTO resultado_tc VALUES (p_id, 'rechazo: ' || p_fragmento, 'rechazo: ' || v_error,
-      CASE WHEN position(lower(p_fragmento) IN lower(v_error)) > 0 THEN 'PASÓ' ELSE 'FALLÓ' END);
+    INSERT INTO resultado_tc VALUES (p_id, CASE WHEN p_fragmento = '' THEN 'rechazo' ELSE 'rechazo: ' || p_fragmento END,
+      'rechazo: ' || v_error,
+      CASE WHEN p_fragmento = '' OR position(lower(p_fragmento) IN lower(v_error)) > 0 THEN 'PASÓ' ELSE 'FALLÓ' END);
   END IF;
 END $$;
 
@@ -240,11 +244,19 @@ SELECT pg_temp.espera_error('TC-GEN-07-030',
 
 -- ---------------------------------------------------------------
 -- Publicar sin pasar por el borrador (ENT-COM-12: 1..N configuraciones al publicarse)
+-- v2: se espera cualquier rechazo; el criterio no fija el mensaje.
 -- ---------------------------------------------------------------
-SELECT pg_temp.espera_error('TC-GEN-07-031',
+SELECT pg_temp.espera_error('TC-GEN-07-031 (1 PUBLICADA)',
   $q$INSERT INTO version_formulario (id_test, codigo_version, fuente_ref, estado, publicada_en, evidencia_validacion)
      VALUES (1, 'V-DIRECTA', 'Material ficticio', 'PUBLICADA', now(), 'ev-ficticia')$q$,
-  'necesita configuraciones');
+  '');
+SELECT pg_temp.espera_error('TC-GEN-07-031 (2 RETIRADA)',
+  $q$INSERT INTO version_formulario (id_test, codigo_version, fuente_ref, estado, publicada_en, evidencia_validacion)
+     VALUES (1, 'V-DIRECTA-RET', 'Material ficticio', 'RETIRADA', now(), 'ev-ficticia')$q$,
+  '');
+SELECT pg_temp.espera_ok('TC-GEN-07-031 (3 BORRADOR)',
+  $q$INSERT INTO version_formulario (id_test, codigo_version, fuente_ref, estado)
+     VALUES (1, 'V-NUEVO-BORRADOR', 'Material ficticio', 'BORRADOR')$q$);
 
 SELECT id, estado, esperado, obtenido FROM resultado_tc ORDER BY id;
 SELECT estado, count(*) FROM resultado_tc GROUP BY estado ORDER BY estado;
