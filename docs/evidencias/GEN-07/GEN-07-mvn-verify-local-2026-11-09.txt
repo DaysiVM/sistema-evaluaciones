@@ -1,0 +1,33 @@
+Ejecución local de mvn verify — PR #23 (pull/23/merge bb03b31) — 2026-11-09 22:31 (America/Managua)
+Equipo: Windows, IntelliJ IDEA 2026.2.3 (Maven integrado), JDK 27, PostgreSQL 18.6 local (base evaluaciones vacía)
+Comando: mvn verify -Dspotless.check.skip=true -f backend/pom.xml
+Extracto de la salida (las líneas ERROR de Hibernate son los rechazos esperados de las pruebas negativas):
+
+[INFO] Running com.universidad.tests.ArquitecturaTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.115 s -- in com.universidad.tests.ArquitecturaTest
+[INFO] Running com.universidad.tests.MigracionesTest
+INFO org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:5432/evaluaciones (PostgreSQL 18.6)
+INFO o.f.core.internal.command.DbMigrate      : Migrating schema "public" to version "202611040249 - comun catalogo versionado"
+INFO o.f.core.internal.command.DbMigrate      : Successfully applied 1 migration to schema "public", now at version v202611040249 (execution time 00:00.052s)
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.023 s -- in com.universidad.tests.MigracionesTest
+[INFO] Running com.universidad.tests.PersistenciaCatalogoIntegrationTest
+WARN o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: P0001
+ERROR o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: No se puede modificar una version publicada o retirada
+WARN o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: P0001
+ERROR o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: La subprueba no pertenece al mismo test que la version
+WARN o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23505
+ERROR o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: duplicate key value violates unique constraint "uq_version_test_codigo"
+WARN o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: P0001
+ERROR o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: No se puede modificar una version publicada o retirada
+WARN o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: P0001
+ERROR o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: Las opciones solo pertenecen a preguntas de seleccion
+WARN o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: P0001
+ERROR o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: No se puede modificar una version publicada o retirada
+[INFO] Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.408 s -- in com.universidad.tests.PersistenciaCatalogoIntegrationTest
+[INFO] Running com.universidad.tests.service.PublicacionVersionFormularioServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.663 s -- in com.universidad.tests.service.PublicacionVersionFormularioServiceTest
+[INFO] Tests run: 24, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Spotless check skipped
+[INFO] BUILD SUCCESS
+[INFO] Total time:  22.230 s
+[INFO] Finished at: 2026-11-09T22:31:38-06:00
