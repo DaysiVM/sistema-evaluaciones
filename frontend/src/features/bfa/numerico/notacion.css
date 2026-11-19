@@ -1,0 +1,8 @@
+/* BFA-FE-06 · notación numérica. Usa los tokens de UI-01 y las piezas de UI-04 (styles.css). */
+
+/* Fracción con signo: el signo queda a la izquierda de la barra, no encima. */
+.num-fraccion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.05em;
+}
