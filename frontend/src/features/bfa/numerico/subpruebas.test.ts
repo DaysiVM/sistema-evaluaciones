@@ -17,6 +17,12 @@ describe('configuración de la familia Numérico', () => {
     expect(letraDeTecla(CONFIG_NUMERICO['N2-A'], 'e')).toBeNull();
   });
 
+  it('permite volver atrás en las cuatro subpruebas (C-1)', () => {
+    for (const config of Object.values(CONFIG_NUMERICO)) {
+      expect(config.volverAtras).toBe(true);
+    }
+  });
+
   it('formatea el tiempo restante', () => {
     expect(formatearTiempo(240)).toBe('04:00');
     expect(formatearTiempo(5)).toBe('00:05');
