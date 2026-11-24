@@ -16,6 +16,10 @@ const MENSAJES: Record<CodigoErrorEvaluacion, string> = {
   LETRA_NO_ASIGNADA: 'Fluidez Verbal necesita una letra inicial asignada.',
   VERSION_INCOMPATIBLE: 'El test no coincide con la versión del formulario.',
   SUBPRUEBA_NO_INCLUIDA: 'Alguna subprueba elegida no pertenece a esta versión del test.',
+  PERIODO_NO_DISPONIBLE: 'El período elegido ya no admite nuevas evaluaciones. Elija otro.',
+  VERSION_AMBIGUA:
+    'El test tiene más de una versión publicada. Pida a coordinación que deje solo una vigente.',
+  RUTA_NO_ENCONTRADA: 'El servidor no reconoce esta operación. Puede que aún no esté disponible.',
   ERROR_INTERNO: 'Ocurrió un error en el servidor. Intente de nuevo más tarde.',
 };
 
@@ -37,7 +41,9 @@ const esCodigoConocido = (codigo: string): codigo is CodigoErrorEvaluacion => co
 /** Convierte cualquier fallo de una llamada en un error listo para mostrar. */
 export function aErrorMostrable(error: unknown): ErrorMostrable {
   if (error instanceof ApiError) {
-    const tipo = tipoPorEstado(error.status);
+    // Un 5xx sin el cuerpo común no viene del backend sino del proxy: el servidor no responde.
+    const sinCuerpo = error.error?.codigo === undefined;
+    const tipo = error.status >= 500 && sinCuerpo ? 'conexion' : tipoPorEstado(error.status);
     const codigo = error.error?.codigo ?? `HTTP_${error.status}`;
     const mensaje =
       tipo === 'conexion'

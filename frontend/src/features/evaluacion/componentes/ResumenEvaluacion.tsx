@@ -94,9 +94,16 @@ export function ResumenEvaluacion({
 
       {activa && (
         <p className="ev-activa">
-          Subprueba activa: <strong>{nombre(activa.codigo)}</strong> · tiempo restante{' '}
-          <span className="ev-reloj">{formatearSegundos(activa.segundosRestantes)}</span>{' '}
-          <span className="ev-ayuda">(según el servidor)</span>
+          Subprueba activa: <strong>{nombre(activa.codigo)}</strong> ·{' '}
+          {activa.segundosRestantes === null ? (
+            'sin límite de tiempo'
+          ) : (
+            <>
+              tiempo restante{' '}
+              <span className="ev-reloj">{formatearSegundos(activa.segundosRestantes)}</span>{' '}
+              <span className="ev-ayuda">(según el servidor)</span>
+            </>
+          )}
         </p>
       )}
       {!activa && enCurso && siguiente && (

@@ -73,7 +73,7 @@ export function FormularioInicio({ test, periodos, onIniciada }: FormularioInici
     valores.aplicacion === 'completa'
       ? test.subpruebas
       : test.subpruebas.filter((s) => valores.subpruebas.includes(s.codigo));
-  const segundos = incluidas.reduce((suma, s) => suma + s.tiempoLimiteSegundos, 0);
+  const segundos = incluidas.reduce((suma, s) => suma + (s.tiempoLimiteSegundos ?? 0), 0);
   const letra = valores.letraInicial.trim().toUpperCase();
 
   const idError = (campo: CampoInicio) => `${id}-${campo}-error`;

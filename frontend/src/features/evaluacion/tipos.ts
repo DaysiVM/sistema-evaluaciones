@@ -41,8 +41,10 @@ export interface ConfiguracionSubprueba {
   codigo: string;
   nombre: string;
   orden: number;
-  factor: string;
-  tiempoLimiteSegundos: number;
+  /** Propio de cada test (extensión BFA); el backend común lo envía nulo por ahora. */
+  factor: string | null;
+  /** Nulo si la subprueba no es cronometrada (ENT-COM-13). */
+  tiempoLimiteSegundos: number | null;
   tipoRespuesta: TipoRespuesta;
   opciones: number | null;
   numeroPreguntas: number;
@@ -80,9 +82,10 @@ export interface IniciarEvaluacionRequest {
 
 export interface SubpruebaActiva {
   codigo: string;
-  finLimite: string;
+  /** Nulo si la subprueba activa no es cronometrada. */
+  finLimite: string | null;
   /** Lo calcula el servidor; el frontend no reinicia ni corrige el reloj. */
-  segundosRestantes: number;
+  segundosRestantes: number | null;
 }
 
 export interface EstadoSubpruebaResponse {
@@ -119,6 +122,9 @@ export type CodigoErrorEvaluacion =
   | 'LETRA_NO_ASIGNADA'
   | 'VERSION_INCOMPATIBLE'
   | 'SUBPRUEBA_NO_INCLUIDA'
+  | 'PERIODO_NO_DISPONIBLE'
+  | 'VERSION_AMBIGUA'
+  | 'RUTA_NO_ENCONTRADA'
   | 'ERROR_INTERNO';
 
 /** Categoría visual del error; decide el tono y la acción sugerida en pantalla. */

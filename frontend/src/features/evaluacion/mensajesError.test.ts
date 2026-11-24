@@ -38,6 +38,18 @@ describe('aErrorMostrable', () => {
     ]);
   });
 
+  it('un 5xx sin el cuerpo común (proxy sin backend) es un error de conexión', () => {
+    expect(aErrorMostrable(new ApiError(500))).toMatchObject({ tipo: 'conexion' });
+    expect(aErrorMostrable(apiError(500, 'ERROR_INTERNO'))).toMatchObject({ tipo: 'servidor' });
+  });
+
+  it.each(['PERIODO_NO_DISPONIBLE', 'VERSION_AMBIGUA', 'RUTA_NO_ENCONTRADA'])(
+    'tiene mensaje propio para %s',
+    (codigo) => {
+      expect(aErrorMostrable(apiError(409, codigo)).mensaje).not.toBe('del servidor');
+    },
+  );
+
   it('un TypeError de fetch es un error de conexión', () => {
     expect(aErrorMostrable(new TypeError('Failed to fetch'))).toMatchObject({
       tipo: 'conexion',

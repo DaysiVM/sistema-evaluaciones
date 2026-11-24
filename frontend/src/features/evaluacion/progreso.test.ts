@@ -38,6 +38,10 @@ describe('formatearSegundos', () => {
   ])('%i → %s', (segundos, texto) => {
     expect(formatearSegundos(segundos)).toBe(texto);
   });
+
+  it('una subprueba sin límite de tiempo se muestra como guion', () => {
+    expect(formatearSegundos(null)).toBe('—');
+  });
 });
 
 describe('formatearFechaHora', () => {

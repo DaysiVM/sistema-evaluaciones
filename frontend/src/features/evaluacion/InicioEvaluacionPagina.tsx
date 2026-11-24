@@ -1,5 +1,7 @@
 import { useId, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router';
+import { TestNotice } from '../../components/TestNotice';
+import { usaMocks } from './cliente';
 import { EstadoCarga } from './componentes/EstadoCarga';
 import { FormularioInicio } from './componentes/FormularioInicio';
 import { MensajeError } from './componentes/MensajeError';
@@ -29,6 +31,12 @@ export function InicioEvaluacionPagina() {
       <header className="ev-pagina-cabecera">
         <h1>Evaluación</h1>
         <p>Inicie una evaluación nueva o retome una existente sin reiniciar su tiempo.</p>
+        {usaMocks && (
+          <TestNotice
+            kind="warning"
+            message="Datos simulados para desarrollo: no se guarda nada en el servidor."
+          />
+        )}
       </header>
       {errorTest ? (
         <MensajeError

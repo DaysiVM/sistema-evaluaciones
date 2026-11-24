@@ -17,8 +17,9 @@ export function calcularProgreso(evaluacion: EvaluacionResponse): ResumenProgres
   return { cerradas, total, porcentaje };
 }
 
-/** 214 → "3:34". */
-export function formatearSegundos(segundos: number): string {
+/** 214 → "3:34"; sin límite de tiempo → "—". */
+export function formatearSegundos(segundos: number | null): string {
+  if (segundos === null) return '—';
   const s = Math.max(0, Math.floor(segundos));
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }

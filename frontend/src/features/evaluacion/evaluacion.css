@@ -574,3 +574,7 @@
     width: 100%;
   }
 }
+
+.ev-pagina-cabecera .test-notice {
+  margin: -0.75rem 0 1.25rem;
+}
