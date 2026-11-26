@@ -1,9 +1,17 @@
 package com.universidad.tests.application.service;
 
+import com.universidad.tests.domain.model.ConfiguracionSubprueba;
+import com.universidad.tests.domain.model.EstadoVersionFormulario;
+import com.universidad.tests.domain.model.OpcionRespuesta;
+import com.universidad.tests.domain.model.Pregunta;
 import com.universidad.tests.domain.model.VersionFormulario;
 import com.universidad.tests.domain.port.AutorizacionContenidoPort;
+import com.universidad.tests.domain.repository.ConfiguracionSubpruebaRepository;
+import com.universidad.tests.domain.repository.OpcionRespuestaRepository;
+import com.universidad.tests.domain.repository.PreguntaRepository;
 import com.universidad.tests.domain.repository.TestRepository;
 import com.universidad.tests.domain.repository.VersionFormularioRepository;
+import java.util.Comparator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
@@ -15,15 +23,82 @@ public class VersionFormularioService {
     private final VersionFormularioRepository versionRepository;
     private final TestRepository testRepository;
     private final AutorizacionContenidoPort autorizacion;
+    private final ConfiguracionSubpruebaRepository configuraciones;
+    private final PreguntaRepository preguntas;
+    private final OpcionRespuestaRepository opciones;
+    private final EdicionContenidoVersionadoService edicion;
 
     public VersionFormularioService(
             VersionFormularioRepository versionRepository,
             TestRepository testRepository,
-            AutorizacionContenidoPort autorizacion) {
+            AutorizacionContenidoPort autorizacion,
+            ConfiguracionSubpruebaRepository configuraciones,
+            PreguntaRepository preguntas,
+            OpcionRespuestaRepository opciones,
+            EdicionContenidoVersionadoService edicion) {
 
         this.versionRepository = versionRepository;
         this.testRepository = testRepository;
         this.autorizacion = autorizacion;
+        this.configuraciones = configuraciones;
+        this.preguntas = preguntas;
+        this.opciones = opciones;
+        this.edicion = edicion;
+    }
+
+    @Transactional
+    public VersionFormulario crearBorradorDesdeUltimaPublicada(
+            Long idTest, String codigoVersion, String descripcion, String fuenteRef) {
+        VersionFormulario borrador = crearBorrador(idTest, codigoVersion, descripcion, fuenteRef);
+        VersionFormulario origen =
+                versionRepository.listarPorTest(idTest).stream()
+                        .filter(v -> v.getEstado() == EstadoVersionFormulario.PUBLICADA)
+                        .max(Comparator.comparing(VersionFormulario::getPublicadaEn))
+                        .orElse(null);
+        if (origen == null) {
+            return borrador;
+        }
+        // E25 ya autorizo la creacion; la copia interna no expone el contenido del origen.
+        for (ConfiguracionSubprueba anterior :
+                configuraciones.listarPorVersion(origen.getIdVersionFormulario())) {
+            ConfiguracionSubprueba nueva =
+                    edicion.guardarConfiguracion(
+                            new ConfiguracionSubprueba(
+                                    null,
+                                    borrador.getIdVersionFormulario(),
+                                    anterior.getIdSubprueba(),
+                                    anterior.getOrdenAplicacion(),
+                                    anterior.getTiempoLimiteSegundos(),
+                                    anterior.getTipoRespuesta(),
+                                    anterior.getInstruccionesRef(),
+                                    anterior.getPracticaRef(),
+                                    anterior.getMaximoEntradas(),
+                                    anterior.getOpcionesEsperadas()));
+            for (Pregunta pregunta :
+                    preguntas.listarPorConfiguracion(anterior.getIdConfiguracionSubprueba())) {
+                Pregunta copia =
+                        edicion.guardarPregunta(
+                                new Pregunta(
+                                        null,
+                                        nueva.getIdConfiguracionSubprueba(),
+                                        pregunta.getNumeroVisible(),
+                                        pregunta.getOrdenPresentacion(),
+                                        pregunta.getEnunciado(),
+                                        pregunta.getRecursoRef()));
+                for (OpcionRespuesta opcion :
+                        opciones.listarPorPregunta(pregunta.getIdPregunta())) {
+                    edicion.guardarOpcion(
+                            new OpcionRespuesta(
+                                    null,
+                                    copia.getIdPregunta(),
+                                    opcion.getCodigo(),
+                                    opcion.getOrdenPresentacion(),
+                                    opcion.getTexto(),
+                                    opcion.getRecursoRef()));
+                }
+            }
+        }
+        return borrador;
     }
 
     @Transactional
@@ -52,7 +127,7 @@ public class VersionFormularioService {
 
         if (versionRepository.existePorTestYCodigo(idTest, codigoVersion)) {
 
-            throw new IllegalArgumentException(
+            throw new VersionDuplicadaException(
                     "Ya existe la version " + codigoVersion + " para el test " + idTest);
         }
 
@@ -118,5 +193,11 @@ public class VersionFormularioService {
         autorizacion.exigirPermisoConsultarContenido(version.getIdVersionFormulario());
 
         return version;
+    }
+
+    public static class VersionDuplicadaException extends IllegalStateException {
+        public VersionDuplicadaException(String mensaje) {
+            super(mensaje);
+        }
     }
 }

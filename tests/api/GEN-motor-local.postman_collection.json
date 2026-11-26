@@ -1,0 +1,346 @@
+{
+  "info": {
+    "name": "GEN motor — solo entorno aislado",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Requiere fixtures ficticios y sesiones privadas del runner. Solo localhost; no ejecutar en VPS ni exportar variables/respuestas."
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if(!/^http:\\/\\/(127\\.0\\.0\\.1|localhost):\\d+$/.test(pm.variables.get('base_url')||'')){pm.execution.skipRequest();throw new Error('Solo localhost');}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "E3 sin sesión",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/api/v1/evaluaciones",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"testId\": {{testId}}, \"versionFormularioId\": {{versionId}}, \"sujetoId\": {{sujetoId}}, \"periodoId\": {{periodoId}}}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('HTTP 401',()=>pm.response.to.have.status(401));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E3 crear con coordinación autorizada",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/api/v1/evaluaciones",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{coord}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"testId\": {{testId}}, \"versionFormularioId\": {{versionId}}, \"sujetoId\": {{sujetoId}}, \"periodoId\": {{periodoId}}}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "if(pm.response.code===201)pm.collectionVariables.set('evaluacionId',pm.response.json().id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E4 sujeto asignado",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/v1/evaluaciones/{{evaluacionId}}",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{sujeto}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('HTTP 200',()=>pm.response.to.have.status(200));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E5 aplicador no responde por sujeto",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/api/v1/evaluaciones/{{evaluacionId}}/subpruebas/SUB/iniciar",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{coord}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('HTTP 403',()=>pm.response.to.have.status(403));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E5 sujeto inicia",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/api/v1/evaluaciones/{{evaluacionId}}/subpruebas/SUB/iniciar",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{sujeto}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('HTTP 200',()=>pm.response.to.have.status(200));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E5 reintento idempotente",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/api/v1/evaluaciones/{{evaluacionId}}/subpruebas/SUB/iniciar",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{sujeto}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('HTTP 200',()=>pm.response.to.have.status(200));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E6 preguntas sin claves",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/v1/evaluaciones/{{evaluacionId}}/subpruebas/SUB/preguntas",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{sujeto}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "if(pm.response.code===200){const q=pm.response.json().preguntas[0];pm.collectionVariables.set('preguntaId',q.id);pm.collectionVariables.set('opcion',q.opciones[0].letra);pm.test('sin clave de correccion',()=>{pm.expect(q).not.to.have.property('correcta');pm.expect(q).not.to.have.property('clave');q.opciones.forEach(o=>pm.expect(o).not.to.have.property('correcta'));});}"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E7 registrar selección ficticia",
+      "request": {
+        "method": "PUT",
+        "url": "{{base_url}}/api/v1/evaluaciones/{{evaluacionId}}/subpruebas/SUB/respuestas",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{sujeto}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"respuestas\": [{\"preguntaId\": {{preguntaId}}, \"opcion\": \"{{opcion}}\"}]}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('HTTP 200',()=>pm.response.to.have.status(200));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E8 activa con tiempo sigue pendiente",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/api/v1/evaluaciones/{{evaluacionId}}/finalizar",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{sujeto}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('HTTP 409',()=>pm.response.to.have.status(409));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E6 sujeto sin asignación",
+      "request": {
+        "method": "GET",
+        "url": "{{base_url}}/api/v1/evaluaciones/{{evaluacionId}}/subpruebas/SUB/preguntas",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{otro}}"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('HTTP 403',()=>pm.response.to.have.status(403));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E7 coordinación no captura",
+      "request": {
+        "method": "PUT",
+        "url": "{{base_url}}/api/v1/evaluaciones/{{evaluacionId}}/subpruebas/SUB/respuestas",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{coord}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"respuestas\": [{\"preguntaId\": {{preguntaId}}, \"opcion\": \"{{opcion}}\"}]}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('HTTP 403',()=>pm.response.to.have.status(403));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E5 sin token",
+      "request": {
+        "method": "POST",
+        "url": "{{base_url}}/api/v1/evaluaciones/{{evaluacionId}}/subpruebas/SUB/iniciar",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('HTTP 401',()=>pm.response.to.have.status(401));"]
+          }
+        }
+      ]
+    }
+  ]
+}

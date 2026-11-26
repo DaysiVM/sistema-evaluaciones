@@ -8,6 +8,9 @@ public interface AutorizacionContenidoPort {
     // Verificar permiso para modificar contenido
     void exigirPermisoEditarContenido(Long idVersionFormulario);
 
+    // E26: configurar subprueba e instrucciones.
+    void exigirPermisoConfigurarSubprueba(Long idVersionFormulario);
+
     // Verificar permiso para publicar versiones
     void exigirPermisoPublicar(Long idVersionFormulario);
 

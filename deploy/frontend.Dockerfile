@@ -4,6 +4,7 @@ WORKDIR /src
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 COPY frontend ./
+ENV VITE_USAR_MOCKS=false
 RUN npm run build
 
 FROM nginx:1.27-alpine

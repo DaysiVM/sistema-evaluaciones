@@ -40,15 +40,28 @@ public class EdicionContenidoVersionadoService {
 
     @Transactional
     public ConfiguracionSubprueba guardarConfiguracion(ConfiguracionSubprueba configuracion) {
+        validarConfiguracion(configuracion);
+        autorizacion.exigirPermisoEditarContenido(configuracion.getIdVersionFormulario());
+        return persistirConfiguracion(configuracion);
+    }
 
+    /** Entrada E26: usa los dos permisos del contrato en toda la cadena de persistencia. */
+    @Transactional
+    public ConfiguracionSubprueba guardarConfiguracionSubprueba(
+            ConfiguracionSubprueba configuracion) {
+        validarConfiguracion(configuracion);
+        autorizacion.exigirPermisoConfigurarSubprueba(configuracion.getIdVersionFormulario());
+        return persistirConfiguracion(configuracion);
+    }
+
+    private void validarConfiguracion(ConfiguracionSubprueba configuracion) {
         if (configuracion == null) {
             throw new IllegalArgumentException("La configuracion es obligatoria");
         }
+    }
 
+    private ConfiguracionSubprueba persistirConfiguracion(ConfiguracionSubprueba configuracion) {
         Long idVersion = configuracion.getIdVersionFormulario();
-
-        autorizacion.exigirPermisoEditarContenido(idVersion);
-
         if (configuracion.getIdConfiguracionSubprueba() != null) {
 
             ConfiguracionSubprueba existente =

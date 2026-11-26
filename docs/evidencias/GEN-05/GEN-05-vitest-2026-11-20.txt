@@ -1,0 +1,16 @@
+npm notice run sistema-evaluaciones-frontend@0.1.0 npx
+npm notice run ^"vitest^" run src/features/resultados src/services/resultados.mock.test.ts src/services/resultados.test.ts
+
+[1m[30m[46m RUN [49m[39m[22m [36mv4.1.12 [39m[90mC:/Users/octav/sistema-evaluaciones/frontend[39m
+
+ [32m✓[39m src/features/resultados/presentacion.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m src/features/resultados/errores.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m src/services/resultados.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m src/services/resultados.mock.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 114[2mms[22m[39m
+ [32m✓[39m src/features/resultados/componentes/VistaResultado.test.tsx [2m([22m[2m7 tests[22m[2m)[22m[32m 108[2mms[22m[39m
+
+[2m Test Files [22m [1m[32m5 passed[39m[22m[90m (5)[39m
+[2m      Tests [22m [1m[32m28 passed[39m[22m[90m (28)[39m
+[2m   Start at [22m 19:14:26
+[2m   Duration [22m 393ms[2m (transform 243ms, setup 0ms, import 381ms, tests 256ms, environment 0ms)[22m
+

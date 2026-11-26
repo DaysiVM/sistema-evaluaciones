@@ -5,8 +5,11 @@ import com.universidad.tests.domain.model.OpcionRespuesta;
 import com.universidad.tests.domain.repository.OpcionRespuestaRepository;
 import com.universidad.tests.infrastructure.persistence.entity.OpcionRespuestaJpaEntity;
 import com.universidad.tests.infrastructure.persistence.entity.PreguntaJpaEntity;
+import com.universidad.tests.infrastructure.persistence.entity.VersionFormularioJpaEntity;
 import com.universidad.tests.infrastructure.persistence.repository.OpcionRespuestaJpaRepository;
 import com.universidad.tests.infrastructure.persistence.repository.PreguntaJpaRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -15,14 +18,18 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-public class OpcionRespuestaPersistenceAdapter implements OpcionRespuestaRepository {
+public class OpcionRespuestaPersistenceAdapter implements OpcionRespuestaRepository.Edicion {
 
     private final OpcionRespuestaJpaRepository opcionJpaRepository;
     private final PreguntaJpaRepository preguntaJpaRepository;
 
+    private final EntityManager entidades;
+
     public OpcionRespuestaPersistenceAdapter(
             OpcionRespuestaJpaRepository opcionJpaRepository,
-            PreguntaJpaRepository preguntaJpaRepository) {
+            PreguntaJpaRepository preguntaJpaRepository,
+            EntityManager entidades) {
+        this.entidades = entidades;
 
         this.opcionJpaRepository = opcionJpaRepository;
         this.preguntaJpaRepository = preguntaJpaRepository;
@@ -149,6 +156,29 @@ public class OpcionRespuestaPersistenceAdapter implements OpcionRespuestaReposit
         OpcionRespuestaJpaEntity guardada = opcionJpaRepository.saveAndFlush(entidad);
 
         return aDominio(guardada);
+    }
+
+    @Override
+    @Transactional
+    public void bloquearVersion(Long idVersion) {
+        if (entidades.find(
+                        VersionFormularioJpaEntity.class, idVersion, LockModeType.PESSIMISTIC_WRITE)
+                == null) {
+            throw new NoSuchElementException("Version no encontrada");
+        }
+    }
+
+    @Override
+    @Transactional
+    public void eliminarPorId(Long idOpcion) {
+        OpcionRespuestaJpaEntity entidad =
+                opcionJpaRepository
+                        .findById(idOpcion)
+                        .orElseThrow(
+                                () -> new NoSuchElementException("No existe la opcion indicada"));
+        validarBorrador(entidad.getPregunta());
+        opcionJpaRepository.delete(entidad);
+        opcionJpaRepository.flush();
     }
 
     private void validarBorrador(PreguntaJpaEntity pregunta) {

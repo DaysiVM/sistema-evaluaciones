@@ -18,4 +18,10 @@ public interface OpcionRespuestaRepository {
     boolean existePorCodigo(Long idPregunta, String codigo);
 
     OpcionRespuesta guardar(OpcionRespuesta opcion);
+
+    interface Edicion extends OpcionRespuestaRepository {
+        void bloquearVersion(Long idVersion);
+
+        void eliminarPorId(Long idOpcion);
+    }
 }

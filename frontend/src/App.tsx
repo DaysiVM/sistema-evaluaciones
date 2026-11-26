@@ -4,6 +4,8 @@ import { Plantilla } from './components/Plantilla';
 import { Ui01Preview } from './dev/Ui01Preview';
 import { Ui04Preview } from './dev/Ui04Preview';
 import { Ui05Preview } from './dev/Ui05Preview';
+import { SesionProveedor } from './features/acceso/SesionProveedor';
+import { RutaProtegida } from './features/acceso/RutaProtegida';
 import { rutasAcceso } from './features/acceso/rutas';
 import { rutasBfa } from './features/bfa/rutas';
 import { rutasCatalogo } from './features/catalog/rutas';
@@ -15,11 +17,12 @@ const router = createBrowserRouter([
   {
     element: <Plantilla />,
     children: [
-      ...rutasCatalogo,
-      ...rutasEvaluacion,
-      ...rutasResultados,
       ...rutasAcceso,
-      ...rutasBfa,
+      {
+        element: <RutaProtegida />,
+        // E9 decide el acceso a resultados según la audiencia publicada, incluido SUJETO.
+        children: [...rutasCatalogo, ...rutasEvaluacion, ...rutasBfa, ...rutasResultados],
+      },
     ],
   },
   // Vista previa de UI-01 (contenido demostrativo).
@@ -30,6 +33,14 @@ const router = createBrowserRouter([
   { path: 'dev/ui-05', element: <Ui05Preview /> },
 ]);
 
+const volverAlLogin = () => {
+  void router.navigate('/acceso', { replace: true });
+};
+
 export function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <SesionProveedor alExpirar={volverAlLogin}>
+      <RouterProvider router={router} />
+    </SesionProveedor>
+  );
 }

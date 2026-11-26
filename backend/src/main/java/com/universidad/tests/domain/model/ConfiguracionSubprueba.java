@@ -11,6 +11,7 @@ public class ConfiguracionSubprueba {
     private final String instruccionesRef;
     private final String practicaRef;
     private final Integer maximoEntradas;
+    private final Integer opcionesEsperadas;
 
     public ConfiguracionSubprueba(
             Long idConfiguracionSubprueba,
@@ -22,6 +23,30 @@ public class ConfiguracionSubprueba {
             String instruccionesRef,
             String practicaRef,
             Integer maximoEntradas) {
+        this(
+                idConfiguracionSubprueba,
+                idVersionFormulario,
+                idSubprueba,
+                ordenAplicacion,
+                tiempoLimiteSegundos,
+                tipoRespuesta,
+                instruccionesRef,
+                practicaRef,
+                maximoEntradas,
+                null);
+    }
+
+    public ConfiguracionSubprueba(
+            Long idConfiguracionSubprueba,
+            Long idVersionFormulario,
+            Long idSubprueba,
+            int ordenAplicacion,
+            Integer tiempoLimiteSegundos,
+            TipoRespuesta tipoRespuesta,
+            String instruccionesRef,
+            String practicaRef,
+            Integer maximoEntradas,
+            Integer opcionesEsperadas) {
 
         if (idVersionFormulario == null || idSubprueba == null) {
             throw new IllegalArgumentException("La version y la subprueba son obligatorias");
@@ -55,6 +80,14 @@ public class ConfiguracionSubprueba {
             throw new IllegalArgumentException("El maximo de entradas debe ser positivo");
         }
 
+        if (opcionesEsperadas != null && opcionesEsperadas <= 0) {
+            throw new IllegalArgumentException("El numero de opciones debe ser positivo");
+        }
+
+        if (tipoRespuesta == TipoRespuesta.TEXTO_LIBRE && opcionesEsperadas != null) {
+            throw new IllegalArgumentException("TEXTO_LIBRE no utiliza opciones cerradas");
+        }
+
         this.idConfiguracionSubprueba = idConfiguracionSubprueba;
         this.idVersionFormulario = idVersionFormulario;
         this.idSubprueba = idSubprueba;
@@ -64,6 +97,7 @@ public class ConfiguracionSubprueba {
         this.instruccionesRef = instruccionesRef;
         this.practicaRef = practicaRef;
         this.maximoEntradas = maximoEntradas;
+        this.opcionesEsperadas = opcionesEsperadas;
     }
 
     public boolean tieneTiempoLimite() {
@@ -104,5 +138,9 @@ public class ConfiguracionSubprueba {
 
     public Integer getMaximoEntradas() {
         return maximoEntradas;
+    }
+
+    public Integer getOpcionesEsperadas() {
+        return opcionesEsperadas;
     }
 }

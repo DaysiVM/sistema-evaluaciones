@@ -1,0 +1,157 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------< com.universidad:sistema-evaluaciones-backend >------------
+[INFO] Building Sistema Integrado de Evaluaciones 0.1.0-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ sistema-evaluaciones-backend ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 4 resources from ..\database\migrations to target\classes\db\migration
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ sistema-evaluaciones-backend ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ sistema-evaluaciones-backend ---
+[INFO] skip non existing resourceDirectory C:\Users\octav\prueba-64\backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ sistema-evaluaciones-backend ---
+[INFO] Recompiling the module because of added or removed source files.
+[INFO] Compiling 9 source files with javac [debug parameters release 17] to target\test-classes
+[INFO] 
+[INFO] --- surefire:3.5.6:test (default-test) @ sistema-evaluaciones-backend ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.universidad.tests.application.evaluator.bfa.BfaTestEvaluatorTest
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.057 s -- in com.universidad.tests.application.evaluator.bfa.BfaTestEvaluatorTest
+[INFO] Running com.universidad.tests.application.evaluator.bfa.ConsolidadorCompuestosBfaTest
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 s -- in com.universidad.tests.application.evaluator.bfa.ConsolidadorCompuestosBfaTest
+[INFO] Running com.universidad.tests.ArquitecturaTest
+13:28:18.514 [main] INFO com.tngtech.archunit.core.PluginLoader -- Detected Java version 17.0.21.0.2
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 1.144 s -- in com.universidad.tests.ArquitecturaTest
+[INFO] Running com.universidad.tests.CatalogoPersistenciaIntegrationTest
+13:28:19.731 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.universidad.tests.CatalogoPersistenciaIntegrationTest]: CatalogoPersistenciaIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+13:28:19.839 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.universidad.tests.TestsApplication for test class com.universidad.tests.CatalogoPersistenciaIntegrationTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.16)
+
+2026-11-23T13:28:20.289-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] .u.t.CatalogoPersistenciaIntegrationTest : Starting CatalogoPersistenciaIntegrationTest using Java 17.0.21.0.2 with PID 18656 (started by octav in C:\Users\octav\prueba-64\backend)
+2026-11-23T13:28:20.291-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] .u.t.CatalogoPersistenciaIntegrationTest : No active profile set, falling back to 1 default profile: "default"
+2026-11-23T13:28:21.379-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-11-23T13:28:21.466-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 75 ms. Found 6 JPA repository interfaces.
+2026-11-23T13:28:22.077-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-11-23T13:28:22.271-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@33e7ece5
+2026-11-23T13:28:22.273-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-11-23T13:28:22.304-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:postgresql://localhost:55432/evaluaciones (PostgreSQL 17.12)
+2026-11-23T13:28:22.386-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 3 migrations (execution time 00:00.037s)
+2026-11-23T13:28:22.421-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "public": 202611170600
+2026-11-23T13:28:22.421-06:00  WARN 18656 --- [sistema-evaluaciones] [           main] o.f.core.internal.command.DbMigrate      : outOfOrder mode is active. Migration of schema "public" may not be reproducible.
+2026-11-23T13:28:22.424-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] o.f.core.internal.command.DbMigrate      : Schema "public" is up to date. No migration necessary.
+2026-11-23T13:28:22.531-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-11-23T13:28:22.609-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.53.Final
+2026-11-23T13:28:22.647-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-11-23T13:28:22.961-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-11-23T13:28:23.041-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.12
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-11-23T13:28:23.853-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-11-23T13:28:23.890-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-11-23T13:28:24.378-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-11-23T13:28:25.631-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 2 endpoints beneath base path '/actuator'
+2026-11-23T13:28:25.702-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] .u.t.CatalogoPersistenciaIntegrationTest : Started CatalogoPersistenciaIntegrationTest in 5.74 seconds (process running for 7.946)
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 6.705 s -- in com.universidad.tests.CatalogoPersistenciaIntegrationTest
+[INFO] Running com.universidad.tests.controller.CatalogoTestsControllerTest
+2026-11-23T13:28:26.360-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.universidad.tests.controller.CatalogoTestsControllerTest]: CatalogoTestsControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-23T13:28:26.384-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.universidad.tests.TestsApplication for test class com.universidad.tests.controller.CatalogoTestsControllerTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::               (v3.5.16)
+
+2026-11-23T13:28:26.406-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] c.u.t.c.CatalogoTestsControllerTest      : Starting CatalogoTestsControllerTest using Java 17.0.21.0.2 with PID 18656 (started by octav in C:\Users\octav\prueba-64\backend)
+2026-11-23T13:28:26.406-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] c.u.t.c.CatalogoTestsControllerTest      : No active profile set, falling back to 1 default profile: "default"
+2026-11-23T13:28:26.925-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-11-23T13:28:26.926-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-11-23T13:28:26.927-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 1 ms
+2026-11-23T13:28:26.952-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] c.u.t.c.CatalogoTestsControllerTest      : Started CatalogoTestsControllerTest in 0.565 seconds (process running for 9.197)
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.855 s -- in com.universidad.tests.controller.CatalogoTestsControllerTest
+[INFO] Running com.universidad.tests.MigracionesTest
+2026-11-23T13:28:27.228-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.universidad.tests.MigracionesTest]: MigracionesTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-23T13:28:27.235-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.universidad.tests.TestsApplication for test class com.universidad.tests.MigracionesTest
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.092 s -- in com.universidad.tests.MigracionesTest
+[INFO] Running com.universidad.tests.PersistenciaCatalogoIntegrationTest
+2026-11-23T13:28:27.321-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.universidad.tests.PersistenciaCatalogoIntegrationTest]: PersistenciaCatalogoIntegrationTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-11-23T13:28:27.323-06:00  INFO 18656 --- [sistema-evaluaciones] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.universidad.tests.TestsApplication for test class com.universidad.tests.PersistenciaCatalogoIntegrationTest
+2026-11-23T13:28:27.493-06:00  WARN 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: P0001
+2026-11-23T13:28:27.493-06:00 ERROR 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: No se puede modificar una version publicada o retirada
+  Where: PL/pgSQL function exigir_version_borrador(bigint) line 17 at RAISE
+SQL statement "SELECT exigir_version_borrador(v_version_id)"
+PL/pgSQL function controlar_pregunta() line 12 at PERFORM
+2026-11-23T13:28:27.612-06:00  WARN 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: P0001
+2026-11-23T13:28:27.612-06:00 ERROR 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: La subprueba no pertenece al mismo test que la version
+  Where: PL/pgSQL function controlar_configuracion() line 24 at RAISE
+2026-11-23T13:28:27.636-06:00  WARN 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: 23505
+2026-11-23T13:28:27.636-06:00 ERROR 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: duplicate key value violates unique constraint "uq_version_test_codigo"
+  Detail: Key (id_test, codigo_version)=(20, v1) already exists.
+2026-11-23T13:28:27.673-06:00  WARN 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: P0001
+2026-11-23T13:28:27.674-06:00 ERROR 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: No se puede modificar una version publicada o retirada
+  Where: PL/pgSQL function exigir_version_borrador(bigint) line 17 at RAISE
+SQL statement "SELECT exigir_version_borrador(OLD.id_version_formulario)"
+PL/pgSQL function controlar_configuracion() line 7 at PERFORM
+2026-11-23T13:28:27.707-06:00  WARN 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: P0001
+2026-11-23T13:28:27.707-06:00 ERROR 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: Las opciones solo pertenecen a preguntas de seleccion
+  Where: PL/pgSQL function controlar_opcion() line 30 at RAISE
+2026-11-23T13:28:27.724-06:00  WARN 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: P0001
+2026-11-23T13:28:27.725-06:00 ERROR 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: Una version debe crearse en estado BORRADOR
+  Where: PL/pgSQL function validar_estado_inicial_version() line 4 at RAISE
+2026-11-23T13:28:27.758-06:00  WARN 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : SQL Error: 0, SQLState: P0001
+2026-11-23T13:28:27.758-06:00 ERROR 18656 --- [sistema-evaluaciones] [           main] o.h.engine.jdbc.spi.SqlExceptionHelper   : ERROR: No se puede modificar una version publicada o retirada
+  Where: PL/pgSQL function exigir_version_borrador(bigint) line 17 at RAISE
+SQL statement "SELECT exigir_version_borrador(v_version_id)"
+PL/pgSQL function controlar_opcion() line 15 at PERFORM
+[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.448 s -- in com.universidad.tests.PersistenciaCatalogoIntegrationTest
+[INFO] Running com.universidad.tests.service.CatalogoTestsServiceTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.314 s -- in com.universidad.tests.service.CatalogoTestsServiceTest
+[INFO] Running com.universidad.tests.service.PublicacionVersionFormularioServiceTest
+[INFO] Tests run: 6, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.157 s -- in com.universidad.tests.service.PublicacionVersionFormularioServiceTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 40, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] --- jar:3.4.2:jar (default-jar) @ sistema-evaluaciones-backend ---
+[INFO] 
+[INFO] --- spring-boot:3.5.16:repackage (repackage) @ sistema-evaluaciones-backend ---
+[INFO] Replacing main artifact C:\Users\octav\prueba-64\backend\target\sistema-evaluaciones-backend-0.1.0-SNAPSHOT.jar with repackaged archive, adding nested dependencies in BOOT-INF/.
+[INFO] The original artifact has been renamed to C:\Users\octav\prueba-64\backend\target\sistema-evaluaciones-backend-0.1.0-SNAPSHOT.jar.original
+[INFO] 
+[INFO] --- spotless:2.46.1:check (formato) @ sistema-evaluaciones-backend ---
+[INFO] Spotless.Java is keeping 63 files clean - 0 needs changes to be clean, 0 were already clean, 63 were skipped because caching determined they were already clean
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  14.698 s
+[INFO] Finished at: 2026-11-23T13:28:29-06:00
+[INFO] ------------------------------------------------------------------------

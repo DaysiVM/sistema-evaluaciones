@@ -1,0 +1,205 @@
+{
+  "info": {
+    "name": "GEN acceso — entorno local aislado",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Crea una cuenta ficticia solo en localhost. Genera claves en memoria. No exportar entornos/respuestas ni ejecutar en el VPS."
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "const base=pm.variables.get('base_url'); if (!/^http:\\/\\/(127\\.0\\.0\\.1|localhost):\\d+$/.test(base || '')) { pm.execution.skipRequest(); throw new Error('Esta colección solo se ejecuta contra localhost.'); }",
+          "if (!pm.collectionVariables.get('correoPrueba')) {const id=pm.variables.replaceIn('{{$guid}}'); pm.collectionVariables.set('correoPrueba', 'aislado-'+id+'@ejemplo.test'); pm.collectionVariables.set('clavePrueba',pm.variables.replaceIn('{{$guid}}')+'Aa!7'); pm.collectionVariables.set('claveIncorrecta',pm.variables.replaceIn('{{$guid}}')+'Bb!8');}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "E1 sin sesión",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/v1/tests"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('401', () => pm.response.to.have.status(401));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E13 registro ficticio",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/v1/auth/registro",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"correo\": \"{{correoPrueba}}\", \"contrasena\": \"{{clavePrueba}}\", \"nombres\": \"Sujeto ficticio\", \"apellidos\": \"Prueba aislada\", \"rol\": \"SUJETO\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('201', () => pm.response.to.have.status(201));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E14 credenciales inválidas",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/v1/auth/sesion",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"correo\": \"{{correoPrueba}}\", \"contrasena\": \"{{claveIncorrecta}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('401', () => pm.response.to.have.status(401));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E14 sesión válida",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{base_url}}/api/v1/auth/sesion",
+        "body": {
+          "mode": "raw",
+          "raw": "{\"correo\": \"{{correoPrueba}}\", \"contrasena\": \"{{clavePrueba}}\"}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200', () => pm.response.to.have.status(200));",
+              "if (pm.response.code === 200) { const s=pm.response.json(); pm.test('contrato y vigencia',()=>{pm.expect(s.token).to.be.a('string').and.not.empty; pm.expect(s.rolActivo).to.eql('SUJETO'); pm.expect(s.permisos).to.be.an('array'); const segundos=(Date.parse(s.expiraEn)-Date.now())/1000; pm.expect(segundos).to.be.within(7100,7300);}); pm.collectionVariables.set('token',s.token); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E1 con Bearer",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{base_url}}/api/v1/tests"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('200', () => pm.response.to.have.status(200));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E15 cerrar sesión",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{base_url}}/api/v1/auth/sesion"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('204', () => pm.response.to.have.status(204));"]
+          }
+        }
+      ]
+    },
+    {
+      "name": "E1 token revocado",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{base_url}}/api/v1/tests"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401', () => pm.response.to.have.status(401));",
+              "pm.collectionVariables.unset('token');"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+[
+  {
+    "id": "TC-GEN-05-001",
+    "titulo": "Consultar con el ID vacío",
+    "estado": "PASÓ",
+    "obtenido": "«Ingrese el ID de la evaluación.» bajo el campo (aria-invalid); no consulta"
+  },
+  {
+    "id": "TC-GEN-05-002",
+    "titulo": "ID con formato inválido (abc, 0, -5, 1.5)",
+    "estado": "PASÓ",
+    "obtenido": "«El ID de la evaluación debe ser un número entero positivo.» con abc, 0, -5 y 1.5; no consulta"
+  },
+  {
+    "id": "TC-GEN-05-003",
+    "titulo": "Ruta directa con ID inválido",
+    "estado": "PASÓ",
+    "obtenido": "/evaluaciones/abc/resultados: error de formato y ninguna consulta"
+  },
+  {
+    "id": "TC-GEN-05-004",
+    "titulo": "Estado de carga mientras responde el servidor",
+    "estado": "PASÓ",
+    "obtenido": "«Consultando resultados…», campo y botón deshabilitados; el resultado aparece solo al responder"
+  },
+  {
+    "id": "TC-GEN-05-005",
+    "titulo": "Cambiar el ID limpia el resultado anterior",
+    "estado": "PASÓ",
+    "obtenido": "Al escribir 17 desaparece el resultado de la evaluación 16 hasta volver a consultar"
+  },
+  {
+    "id": "TC-GEN-05-006",
+    "titulo": "Resultado disponible (evaluación 16)",
+    "estado": "PASÓ",
+    "obtenido": "«Resultado disponible», revisión 1, calificación 31, reglas BFA-REGLAS-v1; 7 factores en el orden recibido (VOC1, VOC2, VOCT, R1, CV, FV, EIV); aviso de datos simulados"
+  },
+  {
+    "id": "TC-GEN-05-007",
+    "titulo": "Factores convertidos",
+    "estado": "PASÓ",
+    "obtenido": "VOC1: VOC1 | 20 | Calculado | 50 | Convertido | —; VOCT: 38 | Calculado | 50 | Convertido (los valores del mock, sin recalcular)"
+  },
+  {
+    "id": "TC-GEN-05-008",
+    "titulo": "Calculado sin conversión y cero recibido",
+    "estado": "PASÓ",
+    "obtenido": "R1: R1 | 12 | Calculado | — | Sin coincidencia en el baremo | La puntuación no coincide con un rango exacto del baremo.; CV: CV | 0 | Calculado | — | Sin baremo validado | No hay baremo aprobado compatible con la edición aplicada."
+  },
+  {
+    "id": "TC-GEN-05-009",
+    "titulo": "Factores no calculables",
+    "estado": "PASÓ",
+    "obtenido": "FV: FV | No calculable | No calculable | — | No aplica | Subprueba no incluida en la aplicación parcial.; EIV: EIV | No calculable | No calculable | — | No aplica | Falta un componente: FV."
+  },
+  {
+    "id": "TC-GEN-05-010",
+    "titulo": "Pendiente de validación (evaluación 17)",
+    "estado": "PASÓ",
+    "obtenido": "«Pendiente de validación», revisión y calificación «—», sin tabla: «No hay una revisión publicada; no se muestran puntuaciones ni percentiles.»"
+  },
+  {
+    "id": "TC-GEN-05-011",
+    "titulo": "En cálculo (evaluación 18)",
+    "estado": "PASÓ",
+    "obtenido": "«En cálculo» («Vuelva a consultar en unos minutos»), sin revisión ni tabla"
+  },
+  {
+    "id": "TC-GEN-05-012",
+    "titulo": "Ruta directa con ID válido",
+    "estado": "PASÓ",
+    "obtenido": "/evaluaciones/16/resultados consulta al abrir: campo con 16 y el resultado disponible"
+  },
+  {
+    "id": "TC-GEN-05-013",
+    "titulo": "Evaluación no finalizada (409)",
+    "estado": "PASÓ",
+    "obtenido": "«La evaluación aún no ha finalizado. Los resultados se podrán consultar cuando se finalice.» como aviso, sin Reintentar ni datos"
+  },
+  {
+    "id": "TC-GEN-05-014",
+    "titulo": "Evaluación inexistente (404)",
+    "estado": "PASÓ",
+    "obtenido": "«No encontrado. No existe una evaluación con ese ID.», sin Reintentar ni datos"
+  },
+  {
+    "id": "TC-GEN-05-015",
+    "titulo": "Acceso denegado (403)",
+    "estado": "PASÓ",
+    "obtenido": "«Acceso denegado. No tiene permiso para consultar los resultados de esta evaluación.»; no muestra ningún dato"
+  },
+  {
+    "id": "TC-GEN-05-016",
+    "titulo": "Error del servidor (500) y Reintentar",
+    "estado": "PASÓ",
+    "obtenido": "«Error del servidor. Ocurrió un error en el servidor. Intente de nuevo más tarde.»; Reintentar vuelve a consultar"
+  },
+  {
+    "id": "TC-GEN-05-017",
+    "titulo": "Sin conexión (503)",
+    "estado": "PASÓ",
+    "obtenido": "«Sin conexión. No se pudo conectar con el servidor. Revise su conexión e intente de nuevo.», con Reintentar"
+  },
+  {
+    "id": "TC-GEN-05-018",
+    "titulo": "No se presentan datos protegidos",
+    "estado": "PASÓ",
+    "obtenido": "En 16, 17 y 18 solo se ven identificadores (Clave = 4); ni contenido de la clave, ni respuestas correctas, ni datos del evaluado"
+  }
+]

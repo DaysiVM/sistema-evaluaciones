@@ -1,0 +1,19 @@
+TC-GEN-05-001 | PASÓ | Consultar con el ID vacío | «Ingrese el ID de la evaluación.» bajo el campo (aria-invalid); no consulta
+TC-GEN-05-002 | PASÓ | ID con formato inválido (abc, 0, -5, 1.5) | «El ID de la evaluación debe ser un número entero positivo.» con abc, 0, -5 y 1.5; no consulta
+TC-GEN-05-003 | PASÓ | Ruta directa con ID inválido | /evaluaciones/abc/resultados: error de formato y ninguna consulta
+TC-GEN-05-004 | PASÓ | Estado de carga mientras responde el servidor | «Consultando resultados…», campo y botón deshabilitados; el resultado aparece solo al responder
+TC-GEN-05-005 | PASÓ | Cambiar el ID limpia el resultado anterior | Al escribir 17 desaparece el resultado de la evaluación 16 hasta volver a consultar
+TC-GEN-05-006 | PASÓ | Resultado disponible (evaluación 16) | «Resultado disponible», revisión 1, calificación 31, reglas BFA-REGLAS-v1; 7 factores en el orden recibido (VOC1, VOC2, VOCT, R1, CV, FV, EIV); aviso de datos simulados
+TC-GEN-05-007 | PASÓ | Factores convertidos | VOC1: VOC1 | 20 | Calculado | 50 | Convertido | —; VOCT: 38 | Calculado | 50 | Convertido (los valores del mock, sin recalcular)
+TC-GEN-05-008 | PASÓ | Calculado sin conversión y cero recibido | R1: R1 | 12 | Calculado | — | Sin coincidencia en el baremo | La puntuación no coincide con un rango exacto del baremo.; CV: CV | 0 | Calculado | — | Sin baremo validado | No hay baremo aprobado compatible con la edición aplicada.
+TC-GEN-05-009 | PASÓ | Factores no calculables | FV: FV | No calculable | No calculable | — | No aplica | Subprueba no incluida en la aplicación parcial.; EIV: EIV | No calculable | No calculable | — | No aplica | Falta un componente: FV.
+TC-GEN-05-010 | PASÓ | Pendiente de validación (evaluación 17) | «Pendiente de validación», revisión y calificación «—», sin tabla: «No hay una revisión publicada; no se muestran puntuaciones ni percentiles.»
+TC-GEN-05-011 | PASÓ | En cálculo (evaluación 18) | «En cálculo» («Vuelva a consultar en unos minutos»), sin revisión ni tabla
+TC-GEN-05-012 | PASÓ | Ruta directa con ID válido | /evaluaciones/16/resultados consulta al abrir: campo con 16 y el resultado disponible
+TC-GEN-05-013 | PASÓ | Evaluación no finalizada (409) | «La evaluación aún no ha finalizado. Los resultados se podrán consultar cuando se finalice.» como aviso, sin Reintentar ni datos
+TC-GEN-05-014 | PASÓ | Evaluación inexistente (404) | «No encontrado. No existe una evaluación con ese ID.», sin Reintentar ni datos
+TC-GEN-05-015 | PASÓ | Acceso denegado (403) | «Acceso denegado. No tiene permiso para consultar los resultados de esta evaluación.»; no muestra ningún dato
+TC-GEN-05-016 | PASÓ | Error del servidor (500) y Reintentar | «Error del servidor. Ocurrió un error en el servidor. Intente de nuevo más tarde.»; Reintentar vuelve a consultar
+TC-GEN-05-017 | PASÓ | Sin conexión (503) | «Sin conexión. No se pudo conectar con el servidor. Revise su conexión e intente de nuevo.», con Reintentar
+TC-GEN-05-018 | PASÓ | No se presentan datos protegidos | En 16, 17 y 18 solo se ven identificadores (Clave = 4); ni contenido de la clave, ni respuestas correctas, ni datos del evaluado
+TOTAL: 18 · PASÓ 18 · FALLÓ 0

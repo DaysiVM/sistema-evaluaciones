@@ -1,0 +1,44 @@
+/* Estilos de GEN-06-FE; reutiliza las clases ev-* del módulo de evaluación. */
+
+.acceso-pagina {
+  max-width: 34rem;
+}
+
+.acceso-enlaces {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-top: 1.25rem;
+}
+
+.acceso-segundo {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--test-line);
+}
+
+.app-nav-usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-left: auto;
+  color: var(--test-secondary);
+  font-size: 0.9rem;
+}
+
+.app-nav-rol {
+  padding: 0.1rem 0.5rem;
+  color: var(--uam-action);
+  font-weight: 700;
+  background: #eef7f8;
+  border-radius: 999px;
+}
+
+.app-nav-salir {
+  padding: 0.35rem 0.7rem;
+  color: var(--test-ink);
+  cursor: pointer;
+  background: var(--test-paper);
+  border: 1px solid var(--test-secondary);
+  border-radius: 6px;
+}

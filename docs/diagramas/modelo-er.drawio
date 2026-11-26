@@ -1,0 +1,566 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="Electron" type="device" pages="1">
+  <diagram id="doc40-nucleo" name="Modelo entidad–relación">
+    <mxGraphModel grid="1" gridSize="10" page="1" pageScale="1" pageWidth="2850" pageHeight="2164" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="relaciones" value="Relaciones" parent="0" />
+        <mxCell id="tablas" value="Tablas y notas" parent="0" />
+        <object id="er-1" label="" tooltip="version_formulario: id_test → test">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.40000;entryX=0.00000;entryY=0.50000;" edge="1" parent="relaciones" source="test" target="version_formulario">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="377" y="925.5166666666667" />
+                <mxPoint x="377" y="1493.0499999999997" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-2" label="" tooltip="subprueba: id_test → test">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.20000;entryX=0.00000;entryY=0.50000;" edge="1" parent="relaciones" source="test" target="subprueba">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="345" y="899.3166666666667" />
+                <mxPoint x="345" y="247.29166666666652" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-3" label="" tooltip="configuracion_subprueba: id_subprueba → subprueba">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.50000;entryX=0.00000;entryY=0.33333;" edge="1" parent="relaciones" source="subprueba" target="configuracion_subprueba">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="er-4" label="" tooltip="configuracion_subprueba: id_version_formulario → version_formulario">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.20000;entryX=0.00000;entryY=0.66667;" edge="1" parent="relaciones" source="version_formulario" target="configuracion_subprueba">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="719" y="1443.5499999999997" />
+                <mxPoint x="719" y="313.6250000000002" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-5" label="" tooltip="pregunta: id_configuracion_subprueba → configuracion_subprueba">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.33333;entryX=0.00000;entryY=0.50000;" edge="1" parent="relaciones" source="configuracion_subprueba" target="pregunta">
+            <mxGeometry relative="1" as="geometry" />
+          </mxCell>
+        </object>
+        <object id="er-6" label="" tooltip="opcion_respuesta: id_pregunta → pregunta">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.50000;entryX=0.00000;entryY=0.50000;" edge="1" parent="relaciones" source="pregunta" target="opcion_respuesta">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1533" y="247.29166666666652" />
+                <mxPoint x="1533" y="230.5" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-7" label="" tooltip="cuenta_rol: id_cuenta → cuenta">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.25000;entryX=0.00000;entryY=0.50000;" edge="1" parent="relaciones" source="cuenta" target="cuenta_rol">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1533" y="1055.05" />
+                <mxPoint x="1533" y="1045.05" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-8" label="" tooltip="sesion: id_cuenta → cuenta">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.50000;entryX=0.00000;entryY=0.66667;" edge="1" parent="relaciones" source="cuenta" target="sesion">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1533" y="1092.05" />
+                <mxPoint x="1533" y="1102.05" />
+                <mxPoint x="1948" y="1102.05" />
+                <mxPoint x="1948" y="1103.8833333333332" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-9" label="" tooltip="sesion: (id_cuenta, rol_activo) → cuenta_rol">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.50000;entryX=0.00000;entryY=0.33333;" edge="1" parent="relaciones" source="cuenta_rol" target="sesion">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1948" y="1045.05" />
+                <mxPoint x="1948" y="1043.2166666666667" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-10" label="" tooltip="evaluacion: id_sujeto → sujeto">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.50000;entryX=0.00000;entryY=0.20000;" edge="1" parent="relaciones" source="sujeto" target="evaluacion">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="735" y="624.6833333333334" />
+                <mxPoint x="735" y="695.0833333333333" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-11" label="" tooltip="evaluacion: id_periodo → periodo">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.50000;entryX=0.00000;entryY=0.40000;" edge="1" parent="relaciones" source="periodo" target="evaluacion">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="703" y="808.6833333333334" />
+                <mxPoint x="703" y="738.2833333333333" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-12" label="" tooltip="evaluacion: id_test → test">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.60000;entryX=0.00000;entryY=0.80000;" edge="1" parent="relaciones" source="test" target="evaluacion">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="361" y="951.7166666666667" />
+                <mxPoint x="361" y="1658.6333333333334" />
+                <mxPoint x="751" y="1658.6333333333334" />
+                <mxPoint x="751" y="824.6833333333332" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-13" label="" tooltip="evaluacion: id_version_formulario → version_formulario">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.40000;entryX=0.00000;entryY=0.60000;" edge="1" parent="relaciones" source="version_formulario" target="evaluacion">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="735" y="1476.5499999999997" />
+                <mxPoint x="735" y="781.4833333333332" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-14" label="" tooltip="evaluacion_subprueba: id_evaluacion → evaluacion">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.33333;entryX=0.00000;entryY=0.66667;" edge="1" parent="relaciones" source="evaluacion" target="evaluacion_subprueba">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1150" y="723.8833333333332" />
+                <mxPoint x="1150" y="618.3833333333334" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-15" label="" tooltip="evaluacion_subprueba: id_configuracion_subprueba → configuracion_subprueba">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.66667;entryX=0.00000;entryY=0.33333;" edge="1" parent="relaciones" source="configuracion_subprueba" target="evaluacion_subprueba">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1150" y="313.6250000000002" />
+                <mxPoint x="1150" y="552.05" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-16" label="" tooltip="respuesta_evaluacion: id_evaluacion → evaluacion">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.16667;entryX=0.00000;entryY=0.75000;" edge="1" parent="relaciones" source="evaluacion" target="respuesta_evaluacion">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1134" y="687.8833333333332" />
+                <mxPoint x="1134" y="415.7916666666665" />
+                <mxPoint x="1948" y="415.7916666666665" />
+                <mxPoint x="1948" y="429.58333333333326" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-17" label="" tooltip="respuesta_evaluacion: id_pregunta → pregunta">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERzeroToOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.75000;entryX=0.00000;entryY=0.50000;" edge="1" parent="relaciones" source="pregunta" target="respuesta_evaluacion">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1533" y="284.2916666666665" />
+                <mxPoint x="1533" y="380.70833333333326" />
+                <mxPoint x="1948" y="380.70833333333326" />
+                <mxPoint x="1948" y="388.33333333333326" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-18" label="" tooltip="respuesta_evaluacion: id_opcion → opcion_respuesta">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERzeroToOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.66667;entryX=0.00000;entryY=0.25000;" edge="1" parent="relaciones" source="opcion_respuesta" target="respuesta_evaluacion">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1948" y="255.16666666666674" />
+                <mxPoint x="1948" y="347.08333333333326" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-19" label="" tooltip="solicitud_calculo_subprueba: id_evaluacion_subprueba → evaluacion_subprueba">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToOne;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.50000;entryX=0.00000;entryY=0.33333;" edge="1" parent="relaciones" source="evaluacion_subprueba" target="solicitud_calculo_subprueba">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1549" y="585.2166666666667" />
+                <mxPoint x="1549" y="652.3833333333332" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-20" label="" tooltip="solicitud_calculo_subprueba: id_evaluacion → evaluacion">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.50000;entryX=0.00000;entryY=0.66667;" edge="1" parent="relaciones" source="evaluacion" target="solicitud_calculo_subprueba">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1166" y="759.8833333333332" />
+                <mxPoint x="1166" y="701.7166666666667" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-21" label="" tooltip="resultado: id_evaluacion → evaluacion">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERmandOne;endArrow=ERzeroToOne;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.83333;entryX=0.00000;entryY=0.50000;" edge="1" parent="relaciones" source="evaluacion" target="resultado">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1134" y="831.8833333333332" />
+                <mxPoint x="1134" y="1276.05" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-22" label="" tooltip="evento_auditoria: id_evaluacion → evaluacion">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERzeroToOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.66667;entryX=0.00000;entryY=0.66667;" edge="1" parent="relaciones" source="evaluacion" target="evento_auditoria">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1150" y="795.8833333333332" />
+                <mxPoint x="1150" y="908.3833333333333" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <object id="er-23" label="" tooltip="evento_auditoria: id_evaluacion_subprueba → evaluacion_subprueba">
+          <mxCell style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#586B80;strokeWidth=1.4;startArrow=ERzeroToOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=9;endSize=9;exitX=1.00000;exitY=0.75000;entryX=0.00000;entryY=0.33333;" edge="1" parent="relaciones" source="evaluacion_subprueba" target="evento_auditoria">
+            <mxGeometry relative="1" as="geometry">
+              <Array as="points">
+                <mxPoint x="1533" y="634.9666666666667" />
+                <mxPoint x="1533" y="847.7166666666666" />
+              </Array>
+            </mxGeometry>
+          </mxCell>
+        </object>
+        <mxCell id="er-24" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.60000;entryX=0.00000;entryY=0.50000;" edge="1" parent="relaciones" source="version_formulario" target="version_clave_bfa">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="767" y="1509.5499999999997" />
+              <mxPoint x="767" y="1470.05" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-25" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.33333;entryX=0.00000;entryY=0.75000;" edge="1" parent="relaciones" source="version_clave_bfa" target="entrada_clave_bfa">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1549" y="1442.05" />
+              <mxPoint x="1549" y="1297.75" />
+              <mxPoint x="1932" y="1297.75" />
+              <mxPoint x="1932" y="237.83333333333326" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-26" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.25000;entryX=0.00000;entryY=0.25000;" edge="1" parent="relaciones" source="pregunta" target="entrada_clave_bfa">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1533" y="210.29166666666652" />
+              <mxPoint x="1533" y="136" />
+              <mxPoint x="1932" y="136" />
+              <mxPoint x="1932" y="173.83333333333326" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-27" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.33333;entryX=0.00000;entryY=0.50000;" edge="1" parent="relaciones" source="opcion_respuesta" target="entrada_clave_bfa">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="er-28" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.66667;entryX=0.00000;entryY=0.50000;" edge="1" parent="relaciones" source="baremo_bfa" target="rango_baremo_bfa">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1932" y="1730.3833333333332" />
+              <mxPoint x="1932" y="1678.1666666666663" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-29" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.80000;entryX=0.00000;entryY=0.50000;" edge="1" parent="relaciones" source="version_formulario" target="regla_calificacion">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="767" y="1542.5499999999997" />
+              <mxPoint x="767" y="1582.0499999999997" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-30" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.50000;entryX=0.00000;entryY=0.66667;" edge="1" parent="relaciones" source="regla_calificacion" target="revision_resultado">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1533" y="1582.05" />
+              <mxPoint x="1533" y="1545.4166666666665" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-31" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.50000;entryX=0.00000;entryY=0.33333;" edge="1" parent="relaciones" source="resultado" target="revision_resultado">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1533" y="1276.05" />
+              <mxPoint x="1533" y="1456.0833333333333" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-32" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERzeroToOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.75000;entryX=0.00000;entryY=0.16667;" edge="1" parent="relaciones" source="cuenta" target="revision_resultado">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1565" y="1129.05" />
+              <mxPoint x="1565" y="1411.4166666666665" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-33" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERzeroToOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.66667;entryX=0.00000;entryY=0.50000;" edge="1" parent="relaciones" source="version_clave_bfa" target="revision_resultado">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1533" y="1498.05" />
+              <mxPoint x="1533" y="1500.75" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-34" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERzeroToOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.33333;entryX=0.00000;entryY=0.83333;" edge="1" parent="relaciones" source="baremo_bfa" target="revision_resultado">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1533" y="1674.3833333333332" />
+              <mxPoint x="1533" y="1590.0833333333333" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-35" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.80000;entryX=0.00000;entryY=0.50000;" edge="1" parent="relaciones" source="test" target="escala">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="345" y="977.9166666666666" />
+              <mxPoint x="345" y="1963.4166666666665" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-36" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.25000;entryX=0.00000;entryY=0.33333;" edge="1" parent="relaciones" source="evaluacion_subprueba" target="puntaje_subprueba">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1964" y="535.4666666666667" />
+              <mxPoint x="1964" y="1389.833333333333" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-37" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.33333;entryX=0.00000;entryY=0.66667;" edge="1" parent="relaciones" source="revision_resultado" target="puntaje_subprueba">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1932" y="1456.0833333333333" />
+              <mxPoint x="1932" y="1439.1666666666663" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-38" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.66667;entryX=0.00000;entryY=0.33333;" edge="1" parent="relaciones" source="revision_resultado" target="resultado_escala">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1948" y="1545.4166666666665" />
+              <mxPoint x="1948" y="1890.833333333333" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-39" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.50000;entryX=0.00000;entryY=0.66667;" edge="1" parent="relaciones" source="escala" target="resultado_escala">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1932" y="1963.4166666666665" />
+              <mxPoint x="1932" y="1953.4999999999998" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-40" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERmandOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.50000;entryX=0.00000;entryY=0.66667;" edge="1" parent="relaciones" source="resultado_escala" target="conversion_resultado_escala">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2346" y="1922.1666666666663" />
+              <mxPoint x="2346" y="1883.7166666666665" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-41" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERzeroToOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=1.00000;exitY=0.50000;entryX=0.00000;entryY=0.33333;" edge="1" parent="relaciones" source="rango_baremo_bfa" target="conversion_resultado_escala">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2346" y="1678.1666666666663" />
+              <mxPoint x="2346" y="1821.05" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="er-42" value="" style="edgeStyle=none;noEdgeStyle=1;rounded=0;html=1;strokeColor=#52687c;strokeWidth=1.6;startArrow=ERzeroToOne;endArrow=ERzeroToMany;startFill=0;endFill=0;startSize=11;endSize=11;exitX=0.33333;exitY=0.00000;entryX=0.66667;entryY=0.00000;" edge="1" parent="relaciones" source="conversion_resultado_escala" target="conversion_resultado_escala">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2525" y="1748.3833333333332" />
+              <mxPoint x="2655" y="1748.3833333333332" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="test" value="test" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="40" y="873.1166666666667" width="284" height="131" />
+        </mxCell>
+        <mxCell id="test-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_test&lt;/b&gt;&lt;br&gt;codigo&lt;br&gt;nombre&lt;br&gt;descripcion&lt;br&gt;activo&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="test">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="91" />
+        </mxCell>
+        <mxCell id="subprueba" value="subprueba" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="398" y="173.29166666666652" width="284" height="148" />
+        </mxCell>
+        <mxCell id="subprueba-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_subprueba&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_test&lt;/b&gt;&lt;br&gt;codigo&lt;br&gt;nombre&lt;br&gt;descripcion&lt;br&gt;factor&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="subprueba">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="108" />
+        </mxCell>
+        <mxCell id="version_formulario" value="version_formulario  ◇" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="398" y="1410.5499999999997" width="284" height="165" />
+        </mxCell>
+        <mxCell id="version_formulario-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_version_formulario&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_test&lt;/b&gt;&lt;br&gt;codigo_version&lt;br&gt;estado&lt;br&gt;fuente_ref&lt;br&gt;publicada_en&lt;br&gt;evidencia_validacion&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="version_formulario">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="125" />
+        </mxCell>
+        <mxCell id="configuracion_subprueba" value="configuracion_subprueba  ◇" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="808.5" y="180.95833333333348" width="284" height="199" />
+        </mxCell>
+        <mxCell id="configuracion_subprueba-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_configuracion_subprueba&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_version_formulario&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_subprueba&lt;/b&gt;&lt;br&gt;orden_aplicacion&lt;br&gt;tiempo_limite_segundos&lt;br&gt;tipo_respuesta&lt;br&gt;instrucciones_ref&lt;br&gt;practica_ref&lt;br&gt;maximo_entradas&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="configuracion_subprueba">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="159" />
+        </mxCell>
+        <mxCell id="pregunta" value="pregunta" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1217.75" y="173.29166666666652" width="284" height="148" />
+        </mxCell>
+        <mxCell id="pregunta-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_pregunta&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_configuracion_subprueba&lt;/b&gt;&lt;br&gt;numero_visible&lt;br&gt;orden_presentacion&lt;br&gt;enunciado&lt;br&gt;recurso_ref&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="pregunta">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="108" />
+        </mxCell>
+        <mxCell id="opcion_respuesta" value="opcion_respuesta" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1613.3333333333333" y="156.5" width="284" height="148" />
+        </mxCell>
+        <mxCell id="opcion_respuesta-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_opcion&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_pregunta&lt;/b&gt;&lt;br&gt;codigo&lt;br&gt;orden_presentacion&lt;br&gt;texto&lt;br&gt;recurso_ref&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="opcion_respuesta">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="108" />
+        </mxCell>
+        <mxCell id="cuenta" value="cuenta" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1228" y="1018.05" width="284" height="148" />
+        </mxCell>
+        <mxCell id="cuenta-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_cuenta&lt;/b&gt;&lt;br&gt;correo&lt;br&gt;resumen_contrasena&lt;br&gt;nombres&lt;br&gt;apellidos&lt;br&gt;estado&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="cuenta">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="108" />
+        </mxCell>
+        <mxCell id="cuenta_rol" value="cuenta_rol" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1606.5" y="1005.05" width="284" height="80" />
+        </mxCell>
+        <mxCell id="cuenta_rol-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  (id_cuenta, rol)&lt;/b&gt;&lt;br&gt;&lt;b&gt;PK / FK  id_cuenta&lt;/b&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="cuenta_rol">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="40" />
+        </mxCell>
+        <mxCell id="sesion" value="sesion" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1985" y="982.55" width="284" height="182" />
+        </mxCell>
+        <mxCell id="sesion-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_sesion&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_cuenta&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  (id_cuenta, rol_activo)&lt;/b&gt;&lt;br&gt;resumen_token&lt;br&gt;rol_activo&lt;br&gt;abierta_en&lt;br&gt;expira_en&lt;br&gt;cerrada_en&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="sesion">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="142" />
+        </mxCell>
+        <mxCell id="sujeto" value="sujeto" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="398" y="550.6833333333334" width="284" height="148" />
+        </mxCell>
+        <mxCell id="sujeto-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_sujeto&lt;/b&gt;&lt;br&gt;codigo_institucional&lt;br&gt;nombres&lt;br&gt;apellidos&lt;br&gt;fecha_nacimiento&lt;br&gt;sexo_referencia&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="sujeto">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="108" />
+        </mxCell>
+        <mxCell id="periodo" value="periodo" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="398" y="734.6833333333334" width="284" height="148" />
+        </mxCell>
+        <mxCell id="periodo-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_periodo&lt;/b&gt;&lt;br&gt;codigo&lt;br&gt;nombre&lt;br&gt;fecha_inicio&lt;br&gt;fecha_fin&lt;br&gt;activo&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="periodo">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="108" />
+        </mxCell>
+        <mxCell id="evaluacion" value="evaluacion" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="810.7777777777778" y="651.8833333333332" width="284" height="216" />
+        </mxCell>
+        <mxCell id="evaluacion-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_evaluacion&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_sujeto&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_periodo&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_test&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_version_formulario&lt;/b&gt;&lt;br&gt;estado&lt;br&gt;fecha_inicio&lt;br&gt;fecha_fin&lt;br&gt;creado_en&lt;br&gt;actualizado_en&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="evaluacion">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="176" />
+        </mxCell>
+        <mxCell id="evaluacion_subprueba" value="evaluacion_subprueba  ◇  *" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1211.6" y="485.7166666666667" width="284" height="199" />
+        </mxCell>
+        <mxCell id="evaluacion_subprueba-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_evaluacion_subprueba&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_evaluacion&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_configuracion_subprueba&lt;/b&gt;&lt;br&gt;estado&lt;br&gt;fecha_inicio&lt;br&gt;fecha_fin_limite&lt;br&gt;fecha_cierre&lt;br&gt;letra_inicial&lt;br&gt;maximo_entradas&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="evaluacion_subprueba">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="159" />
+        </mxCell>
+        <mxCell id="respuesta_evaluacion" value="respuesta_evaluacion  *" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1985" y="305.83333333333326" width="284" height="165" />
+        </mxCell>
+        <mxCell id="respuesta_evaluacion-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_respuesta_evaluacion&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_evaluacion&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_pregunta&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_opcion&lt;/b&gt;&lt;br&gt;valor_texto&lt;br&gt;orden_entrada&lt;br&gt;fecha_registro&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="respuesta_evaluacion">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="125" />
+        </mxCell>
+        <mxCell id="solicitud_calculo_subprueba" value="solicitud_calculo_subprueba  *" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1586" y="603.05" width="284" height="148" />
+        </mxCell>
+        <mxCell id="solicitud_calculo_subprueba-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK / FK  id_evaluacion_subprueba&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_evaluacion&lt;/b&gt;&lt;br&gt;codigo_test&lt;br&gt;codigo_subprueba&lt;br&gt;fecha_cierre&lt;br&gt;procesada_en&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="solicitud_calculo_subprueba">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="108" />
+        </mxCell>
+        <mxCell id="resultado" value="resultado  ◇" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1207.5" y="1202.05" width="284" height="148" />
+        </mxCell>
+        <mxCell id="resultado-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_resultado&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_evaluacion (única)&lt;/b&gt;&lt;br&gt;estado&lt;br&gt;creado_en&lt;br&gt;actualizado_en&lt;br&gt;referencia_revision_vigente&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="resultado">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="108" />
+        </mxCell>
+        <mxCell id="evento_auditoria" value="evento_auditoria  *" style="swimlane;horizontal=1;startSize=35;rounded=0;collapsible=0;html=0;fillColor=#E2E7ED;swimlaneFillColor=#F7F9FB;strokeColor=#768493;strokeWidth=1.3;fontColor=#17242F;fontFamily=Arial;fontStyle=1;fontSize=17;align=left;spacingLeft=11;spacing=0;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1586" y="787.05" width="284" height="182" />
+        </mxCell>
+        <mxCell id="evento_auditoria-fields" value="&lt;div style=&quot;line-height:17px&quot;&gt;&lt;b&gt;PK  id_evento_auditoria&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_evaluacion&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_evaluacion_subprueba&lt;/b&gt;&lt;br&gt;actor_ref&lt;br&gt;accion&lt;br&gt;entidad_tipo&lt;br&gt;entidad_id&lt;br&gt;ocurrido_en&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;spacing=0;overflow=hidden;whiteSpace=nowrap;fontFamily=Arial;fontSize=14;fontColor=#293544;connectable=0;" vertex="1" parent="evento_auditoria">
+          <mxGeometry as="geometry" x="11" y="40" width="266" height="142" />
+        </mxCell>
+        <mxCell id="version_clave_bfa" value="version_clave_bfa" style="swimlane;horizontal=1;startSize=35;collapsible=0;html=0;fillColor=#dceeff;swimlaneFillColor=#f3f9ff;strokeColor=#3575ab;strokeWidth=1.5;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=11;dashed=1;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1187" y="1386.05" width="325" height="168" />
+        </mxCell>
+        <mxCell id="version_clave_bfa-fields" value="&lt;div style=&quot;line-height:20px&quot;&gt;&lt;b&gt;PK  id_clave&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_version_formulario&lt;/b&gt;&lt;br&gt;version&lt;br&gt;estado&lt;br&gt;referencia_fuente&lt;br&gt;evidencia_aprobacion&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;overflow=hidden;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#293544;connectable=0;" vertex="1" parent="version_clave_bfa">
+          <mxGeometry as="geometry" x="11" y="40" width="305" height="128" />
+        </mxCell>
+        <mxCell id="entrada_clave_bfa" value="entrada_clave_bfa" style="swimlane;horizontal=1;startSize=35;collapsible=0;html=0;fillColor=#dceeff;swimlaneFillColor=#f3f9ff;strokeColor=#3575ab;strokeWidth=1.5;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=11;dashed=1;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1985" y="141.83333333333326" width="325" height="128" />
+        </mxCell>
+        <mxCell id="entrada_clave_bfa-fields" value="&lt;div style=&quot;line-height:20px&quot;&gt;&lt;b&gt;PK  id_entrada_clave&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_clave&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_pregunta&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_opcion_correcta&lt;/b&gt;&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;overflow=hidden;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#293544;connectable=0;" vertex="1" parent="entrada_clave_bfa">
+          <mxGeometry as="geometry" x="11" y="40" width="305" height="88" />
+        </mxCell>
+        <mxCell id="baremo_bfa" value="baremo_bfa" style="swimlane;horizontal=1;startSize=35;collapsible=0;html=0;fillColor=#fee4cb;swimlaneFillColor=#fff8f0;strokeColor=#b26021;strokeWidth=1.5;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=11;dashed=1;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1187" y="1618.3833333333332" width="325" height="168" />
+        </mxCell>
+        <mxCell id="baremo_bfa-fields" value="&lt;div style=&quot;line-height:20px&quot;&gt;&lt;b&gt;PK  id_baremo&lt;/b&gt;&lt;br&gt;nombre&lt;br&gt;version&lt;br&gt;anio_norma&lt;br&gt;poblacion_referencia&lt;br&gt;referencia_fuente&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;overflow=hidden;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#293544;connectable=0;" vertex="1" parent="baremo_bfa">
+          <mxGeometry as="geometry" x="11" y="40" width="305" height="128" />
+        </mxCell>
+        <mxCell id="rango_baremo_bfa" value="rango_baremo_bfa" style="swimlane;horizontal=1;startSize=35;collapsible=0;html=0;fillColor=#fee4cb;swimlaneFillColor=#fff8f0;strokeColor=#b26021;strokeWidth=1.5;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=11;dashed=1;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1992.5" y="1564.1666666666663" width="325" height="228" />
+        </mxCell>
+        <mxCell id="rango_baremo_bfa-fields" value="&lt;div style=&quot;line-height:20px&quot;&gt;&lt;b&gt;PK  id_rango&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_baremo&lt;/b&gt;&lt;br&gt;id_factor (código, sin FK)&lt;br&gt;percentil&lt;br&gt;limite_inferior&lt;br&gt;limite_superior&lt;br&gt;estado_celda&lt;br&gt;valor_original&lt;br&gt;localizador_fuente&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;overflow=hidden;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#293544;connectable=0;" vertex="1" parent="rango_baremo_bfa">
+          <mxGeometry as="geometry" x="11" y="40" width="305" height="188" />
+        </mxCell>
+        <mxCell id="regla_calificacion" value="regla_calificacion" style="swimlane;horizontal=1;startSize=35;collapsible=0;html=0;fillColor=#fee4cb;swimlaneFillColor=#fff8f0;strokeColor=#b26021;strokeWidth=1.5;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=11;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="788" y="1488.0499999999997" width="325" height="188" />
+        </mxCell>
+        <mxCell id="regla_calificacion-fields" value="&lt;div style=&quot;line-height:20px&quot;&gt;&lt;b&gt;PK  id_regla_calificacion&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_version_formulario&lt;/b&gt;&lt;br&gt;version&lt;br&gt;estado&lt;br&gt;referencia_especificacion&lt;br&gt;referencia_implementacion&lt;br&gt;evidencia_aprobacion&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;overflow=hidden;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#293544;connectable=0;" vertex="1" parent="regla_calificacion">
+          <mxGeometry as="geometry" x="11" y="40" width="305" height="148" />
+        </mxCell>
+        <mxCell id="revision_resultado" value="revision_resultado" style="swimlane;horizontal=1;startSize=35;collapsible=0;html=0;fillColor=#fee4cb;swimlaneFillColor=#fff8f0;strokeColor=#b26021;strokeWidth=1.5;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=11;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1586" y="1366.75" width="325" height="268" />
+        </mxCell>
+        <mxCell id="revision_resultado-fields" value="&lt;div style=&quot;line-height:20px&quot;&gt;&lt;b&gt;PK  id_revision_resultado&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_resultado&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_regla_calificacion&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_cuenta · opcional&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_clave · solo BFA, opcional&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_baremo · solo BFA, opcional&lt;/b&gt;&lt;br&gt;numero_revision&lt;br&gt;fecha_calculo&lt;br&gt;estado_revision&lt;br&gt;fecha_revision&lt;br&gt;motivo&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;overflow=hidden;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#293544;connectable=0;" vertex="1" parent="revision_resultado">
+          <mxGeometry as="geometry" x="11" y="40" width="305" height="228" />
+        </mxCell>
+        <mxCell id="escala" value="escala" style="swimlane;horizontal=1;startSize=35;collapsible=0;html=0;fillColor=#fee4cb;swimlaneFillColor=#fff8f0;strokeColor=#b26021;strokeWidth=1.5;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=11;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="788" y="1879.4166666666665" width="325" height="168" />
+        </mxCell>
+        <mxCell id="escala-fields" value="&lt;div style=&quot;line-height:20px&quot;&gt;&lt;b&gt;PK  id_escala&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_test&lt;/b&gt;&lt;br&gt;codigo&lt;br&gt;nombre&lt;br&gt;tipo_salida&lt;br&gt;nivel_calculo&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;overflow=hidden;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#293544;connectable=0;" vertex="1" parent="escala">
+          <mxGeometry as="geometry" x="11" y="40" width="305" height="128" />
+        </mxCell>
+        <mxCell id="puntaje_subprueba" value="puntaje_subprueba" style="swimlane;horizontal=1;startSize=35;collapsible=0;html=0;fillColor=#fee4cb;swimlaneFillColor=#fff8f0;strokeColor=#b26021;strokeWidth=1.5;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=11;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1985" y="1340.4999999999995" width="340" height="148" />
+        </mxCell>
+        <mxCell id="puntaje_subprueba-fields" value="&lt;div style=&quot;line-height:20px&quot;&gt;&lt;b&gt;PK  id_puntaje_subprueba&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_revision_resultado&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_evaluacion_subprueba&lt;/b&gt;&lt;br&gt;puntaje_bruto&lt;br&gt;estado_calculo&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;overflow=hidden;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#293544;connectable=0;" vertex="1" parent="puntaje_subprueba">
+          <mxGeometry as="geometry" x="11" y="40" width="320" height="108" />
+        </mxCell>
+        <mxCell id="resultado_escala" value="resultado_escala" style="swimlane;horizontal=1;startSize=35;collapsible=0;html=0;fillColor=#fee4cb;swimlaneFillColor=#fff8f0;strokeColor=#b26021;strokeWidth=1.5;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=11;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="1985" y="1828.1666666666663" width="340" height="188" />
+        </mxCell>
+        <mxCell id="resultado_escala-fields" value="&lt;div style=&quot;line-height:20px&quot;&gt;&lt;b&gt;PK  id_resultado_escala&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_revision_resultado&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_escala&lt;/b&gt;&lt;br&gt;puntaje_bruto&lt;br&gt;estado_calculo&lt;br&gt;estado_normativo&lt;br&gt;motivo&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;overflow=hidden;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#293544;connectable=0;" vertex="1" parent="resultado_escala">
+          <mxGeometry as="geometry" x="11" y="40" width="320" height="148" />
+        </mxCell>
+        <mxCell id="conversion_resultado_escala" value="conversion_resultado_escala" style="swimlane;horizontal=1;startSize=35;collapsible=0;html=0;fillColor=#fee4cb;swimlaneFillColor=#fff8f0;strokeColor=#b26021;strokeWidth=1.5;fontFamily=Arial;fontSize=17;fontStyle=1;align=left;spacingLeft=11;" vertex="1" parent="tablas">
+          <mxGeometry as="geometry" x="2395" y="1758.3833333333332" width="390" height="188" />
+        </mxCell>
+        <mxCell id="conversion_resultado_escala-fields" value="&lt;div style=&quot;line-height:20px&quot;&gt;&lt;b&gt;PK  id_conversion_resultado_escala&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_resultado_escala&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_rango · percentil BFA&lt;/b&gt;&lt;br&gt;&lt;b&gt;FK  id_conversion_origen · opcional&lt;/b&gt;&lt;br&gt;tipo_salida&lt;br&gt;puntaje_convertido&lt;br&gt;valor_categoria&lt;/div&gt;" style="text;html=1;align=left;verticalAlign=top;overflow=hidden;spacing=0;fontFamily=Arial;fontSize=15;fontColor=#293544;connectable=0;" vertex="1" parent="conversion_resultado_escala">
+          <mxGeometry as="geometry" x="11" y="40" width="370" height="148" />
+        </mxCell>
+        <mxCell id="title" value="Modelo entidad–relación · Sistema Integrado de Evaluaciones" vertex="1" parent="tablas" style="text;html=0;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=36;fontStyle=1;fontColor=#263448;">
+          <mxGeometry as="geometry" x="28" y="18" width="2769" height="48" />
+        </mxCell>
+        <mxCell id="legend" value="Sprint 03 · DOC-43   |   Gris: núcleo   ·   Azul: ítems   ·   Naranja: calificación   ·   Borde punteado: tablas propias de BFA" vertex="1" parent="tablas" style="text;html=0;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=19;fontStyle=0;fontColor=#263448;">
+          <mxGeometry as="geometry" x="28" y="75" width="2769" height="31" />
+        </mxCell>
+        <mxCell id="audit" value="Auditoría: DOC-31 define actor_ref; DOC-35-COM propone id_cuenta (FK) e id_evento (PK). DOC-42 no resuelve esta diferencia." vertex="1" parent="tablas" style="text;html=0;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=17;fontStyle=0;fontColor=#263448;">
+          <mxGeometry as="geometry" x="28" y="2067" width="2769" height="29" />
+        </mxCell>
+        <mxCell id="scope" value="Pendientes: DOC-33, baremos genéricos (OTR-05) y FK normativas de Weill. Las FK de sujeto y periodo siguen el diseño de DOC-31." vertex="1" parent="tablas" style="text;html=0;align=left;verticalAlign=middle;fontFamily=Arial;fontSize=17;fontStyle=0;fontColor=#263448;">
+          <mxGeometry as="geometry" x="28" y="2099" width="2769" height="29" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
