@@ -98,3 +98,88 @@ Para mayores de 16 años la elección entre AD y UN sigue abierta en **H-06**. M
 - [S02-WEI-DOC-06 v03, §§2–4 y 8 · Borrador técnico](https://docs.google.com/document/d/1Ts_eYyL3TyeuNZngVHXyI2OAa9MRiKVvNUs-Kz3kbPk/edit) · [S02-WEI-DOC-09 v02, §8.3 · Contrato de resultados E9](https://docs.google.com/document/d/1ibpisceSEzyksY-psPy6g2zhRJIn_VdJQb4MrYAy2Yo/edit).
 
 ## Thurstone, Allport y Orientación vocacional
+
+
+**DOC-34-OTR · Propuesta para revisión de Iván · 24 de noviembre de 2026.**
+Se reutiliza el núcleo DOC-31 y las tablas del mismo tema fijadas por DOC-34-BFAW (#114). No se crean dependencias con tablas de otros temas ni con tablas exclusivas de BFA. Esta sección propone persistencia; no habilita reglas psicométricas, migraciones ni endpoints. DOC-37 y DOC-39 siguen pendientes y la Nota Allport de DOC-38 espera aceptación.
+
+### Evidencia estructural y límites
+
+| Test | Evidencia consultada | Consecuencia para calificación y baremos |
+|---|---|---|
+| Thurstone | [Escala de intereses](https://drive.google.com/file/d/1F7-JqGMroRAISSdqeKddMo9_kym3LuZw/view), bloques «Índice de intereses», «Áreas ocupacionales» e instrucciones. Diez áreas: CF Ciencias Físicas, CB Ciencias Biológicas, Cp Computacional, C Comercial, E Ejecutiva, P Persuasivo, L Lingüística, H Humanitaria, A Artística y M Musical. Admite preferencia por una alternativa, ambas o ninguna. | Diez escalas candidatas. El gráfico 0–20 no demuestra una conversión a percentil o eneatipo. La matriz y sus totales no bastan para fijar una regla de corrección aprobada, el tratamiento de omisiones ni criterios de población. No equiparar «ninguna» con respuesta ausente. OTR-01. |
+| Allport | [Nota Allport DOC-38](https://docs.google.com/document/d/1n0HlwlahyGj7FsjEJPNKBhUzdOF7GHsOlfJvHih-RgE/edit), puntos 1–7, basada en «Estudio de Valores (Corregido).pdf», pp. 1, 6 y 10–11. Dos partes con distribución de puntos y ordenación; seis escalas: teorético, económico, estético, social, político y religioso. | Seis puntajes por evaluación. Los aportes de ambas partes se agregan por escala con correcciones documentadas; la correspondencia entre columnas y escalas cambia por página. La suma de control 240 en aplicaciones completas no constituye otra escala. Los valores corregidos siguen siendo puntajes brutos: las correcciones no son una conversión por baremo. No se documentan normas en la fuente revisada. ALL-01 a ALL-05. |
+| Orientación vocacional | [Entrevista 2026](https://drive.google.com/file/d/1L93Wu7JnTaPj2mQDq-m0Qkzz-LDwvD9Y/view), áreas familiar, escolar, personal, habilidades y hábitos de estudio, social y valores; [Formato AVP](https://drive.google.com/file/d/1Y6SMSqqn98jCWTmwSCmDaH4GD0VWrsOC/view), secciones I–VII (VI repetido en el original). | Los formatos recogen respuestas abiertas, selección y preferencias ordenadas. No incluyen algoritmo de calificación, escalas psicométricas ni baremos. Las áreas de entrevista no se convierten en factores. No se propone una puntuación ni recomendación automática; la salida profesional y su revisión requieren confirmación en OTR-03. |
+
+Los localizadores de los DOCX son sus encabezados, sin atribuirles páginas que la extracción no conserva. No se reproducen preguntas, alternativas ni claves por ítem. Los modelos EA previos no se usan como autoridad de puntuación.
+
+### Reutilización del núcleo
+
+Las FK siguientes conservan los nombres de DOC-31. Cada hijo pertenece a un padre; 1:N admite cero hijos salvo restricción explícita.
+
+| Tabla y PK | FK y cardinalidad | Atributos principales y uso |
+|---|---|---|
+| `test` · `id_test`; `subprueba` · `id_subprueba` | `test` sin FK; `subprueba.id_test` → `test.id_test`, 1:N. | `codigo`, `nombre`; `subprueba.factor` conserva la asignación a una escala / factor. No crear una subprueba por escala si no se aplica por separado. |
+| `version_formulario` · `id_version_formulario`; `configuracion_subprueba` · `id_configuracion_subprueba` | Versión: `id_test` → `test.id_test`, 1:N. Configuración: `id_version_formulario` → versión e `id_subprueba` → subprueba, ambas 1:N. | Edición, `estado`, `fuente_ref`, `evidencia_validacion`; configuración aplicada. Las dos partes Allport no se declaran aplicaciones independientes sin confirmación. |
+| `evaluacion` · `id_evaluacion` | `id_test`, `id_version_formulario`, `id_sujeto`, `id_periodo` → respectivas PK del núcleo, cada padre 1:N evaluaciones. | `estado`, `fecha_inicio`, `fecha_fin`; fija instrumento, edición y sujeto. Los criterios normativos se evalúan a la fecha de aplicación. |
+| `evaluacion_subprueba` · `id_evaluacion_subprueba` | `id_evaluacion` → evaluación; `id_configuracion_subprueba` → configuración, ambas 1:N. | Estado y tiempos de la aplicación de subprueba. No duplicarlos en tablas de resultados. |
+| `respuesta_evaluacion` · `id_respuesta_evaluacion` | `id_evaluacion` → evaluación, 1:N; `id_pregunta` → `pregunta.id_pregunta` e `id_opcion` → `opcion_respuesta.id_opcion`, opcionales, cada padre 1:N. | `valor_texto`, `orden_entrada`, `fecha_registro`. La distribución y ordenación de Allport y las marcas de Thurstone necesitan resolución del tema de respuestas; no guardar una clave o un puntaje como si fueran respuesta de selección única. OTR-04. |
+| `resultado` · `id_resultado` | `id_evaluacion` → evaluación, única: evaluación 1:0..1 resultado. | `estado`, `creado_en`, `actualizado_en`, `referencia_revision_vigente`. Reutilizar el contenedor y su publicación sin crear un resultado por test. |
+| `cuenta` · `id_cuenta`; `evento_auditoria` · `id_evento_auditoria` | Cuenta sin FK; evento: `id_evaluacion` y `id_evaluacion_subprueba` → respectivas PK, opcionales, padres 1:N eventos. | Cuenta identifica a quien revisa; evento conserva `actor_ref`, `accion`, `entidad_tipo`, `entidad_id`, `ocurrido_en`. No crear usuarios o auditorías propios. |
+
+### Tablas del tema que se reutilizan
+
+Son las mismas tablas propuestas en «BFA y Weill», no nuevas copias con sufijos por test. Su ruta de FK termina en el núcleo. Las extensiones que se señalan quedan sujetas a revisión conjunta; no se modifica la sección anterior ni el núcleo.
+
+| Tabla y PK | FK y cardinalidad | Atributos y aplicación a estos tests |
+|---|---|---|
+| `escala` · `id_escala` | `id_test` → `test.id_test`, test 1:N escalas. | `codigo`, `nombre`, `tipo_salida`, `nivel_calculo`; única por test/código. Diez áreas Thurstone y seis escalas Allport, sin cargar códigos nuevos de API. No crear escalas para las áreas de entrevista. El catálogo permite varias salidas por evaluación, que `subprueba.factor` por sí solo no representa. |
+| `regla_calificacion` · `id_regla_calificacion` | `id_version_formulario` → `version_formulario.id_version_formulario`, 1:N. | `version`, `estado`, `referencia_especificacion`, `referencia_implementacion`, `evidencia_aprobacion`; única por formulario/versión. La especificación versionada identifica agregaciones, correcciones, correspondencias de página y tratamiento de ausencias. No se transcriben claves ni se introduce una fórmula ejecutable sin fuente aprobada. |
+| `revision_resultado` · `id_revision_resultado` | `id_resultado` → `resultado.id_resultado`; `id_regla_calificacion` → regla del tema, ambas 1:N. `id_cuenta` → `cuenta.id_cuenta`, 0..1 revisora por revisión, cuenta 1:N revisiones. | `numero_revision`, `fecha_calculo`, `estado_revision`, `fecha_revision`, `motivo`; única por resultado/número. Para Thurstone y Allport las FK BFA `id_clave` e `id_baremo` permanecen nulas. Conservar criterio poblacional aplicado cuando exista norma validada. No fabricar una regla de cálculo para usar esta tabla en entrevista; OTR-03 debe resolver su revisión cualitativa. |
+| `resultado_escala` · `id_resultado_escala` | `id_revision_resultado` → revisión e `id_escala` → escala, ambas 1:N; resuelve N:M revisión/escala. | Única por revisión/escala; `puntaje_bruto`, `estado_calculo`, `estado_normativo`, `motivo`. En Allport conserva el valor final tras correcciones, sin llamarlo percentil. Un valor pendiente queda ausente, nunca cero por defecto. |
+| `conversion_resultado_escala` · `id_conversion_resultado_escala` | `id_resultado_escala` → resultado de escala, 1:N; `id_conversion_origen` → la misma tabla, opcional, origen 1:N derivadas. Extensión propuesta: `id_fila_baremo` → `fila_baremo.id_fila_baremo`, fila 1:N conversiones. | `tipo_salida`, `puntaje_convertido` o `valor_categoria`, fuente versionada; única por resultado de escala/tipo. Para estos tests `id_rango` de BFA es nulo. Una conversión normativa directa exige la fila propia validada; nunca se usa un rango BFA ni se calcula un eneatipo por analogía. OTR-05. |
+
+No se necesita `puntaje_subprueba` para simular totales de las partes o áreas. Si DOC-37/38 confirma una subprueba calificada independientemente, se reutiliza esa tabla del mismo tema: PK `id_puntaje_subprueba`, FK `id_revision_resultado` → revisión e `id_evaluacion_subprueba` → aplicación, N:M resuelta con unicidad de la pareja; atributos `puntaje_bruto` y `estado_calculo`. Hasta entonces no se exigen esos registros.
+
+### Tablas adicionales propuestas para baremos
+
+El núcleo no contiene normas ni filas normativas y las tablas `baremo_bfa`/`rango_baremo_bfa` son exclusivas de BFA. Se proponen dos tablas del tema, sin cargar datos ni afirmar que exista una norma aplicable a los tres instrumentos. PK nuevas: `BIGINT GENERATED BY DEFAULT AS IDENTITY`; FK del mismo tipo que su destino.
+
+| Tabla y PK | FK y cardinalidad | Atributos principales y justificación |
+|---|---|---|
+| `baremo` · `id_baremo` | `id_version_formulario` → `version_formulario.id_version_formulario`, versión 1:N baremos. | `codigo`, `version`, `poblacion_referencia`, `criterio_poblacion`, `edad_minima`, `edad_maxima`, `sexo_referencia`, `escolaridad`, `referencia_fuente`, `localizador_fuente`, `estado`, `evidencia_aprobacion`. Única por formulario/código/versión; cada registro identifica una población y una edición normativa. Criterios tipados solo cuando la fuente los exige: nulo no significa «cualquier población» sin respaldo explícito. Una nueva norma crea una versión, sin sobrescribir la usada. |
+| `fila_baremo` · `id_fila_baremo` | `id_baremo` → baremo e `id_escala` → escala del tema, ambos 1:N. Baremo y escala son N:M mediante sus filas. | `limite_inferior`, `limite_superior`, `tipo_salida`, `puntaje_convertido`, `localizador_fuente`. Una fila representa un intervalo inclusivo de puntaje bruto y una salida documentada (percentil o eneatipo, si procede). Única por baremo/escala/tipo/extremos; impedir solapamientos dentro de baremo/escala/tipo. Se requiere mínimo ≤ máximo y una salida válida; ausencia de equivalencia se expresa sin fila, no con cero. |
+
+La elección de norma exige una única población compatible con la edición y la escala; si hay varias candidatas, falta criterio o el puntaje no coincide, no se convierte. La referencia desde la conversión a la fila conserva la norma y población usadas, sin introducir FK genéricas desde el núcleo. Ninguna de estas tablas depende del tema de ítems o de tablas BFA. No se presupone que edad, sexo o escolaridad sean criterios reales de Thurstone o Allport: son capacidad propuesta pendiente de fuente, no valores por defecto.
+
+### Revisión, publicación y controles
+
+1. Cada escala y regla debe pertenecer al test y a la versión de la evaluación del resultado. Cada conversión debe usar una fila de la misma escala y un baremo de esa versión; comprobar la población empleada y registrar la evidencia, sin inferirla de una variante de ítem.
+2. Conservar reglas y normas utilizadas de forma inmutable. Una nueva corrección crea otra revisión; no sustituye puntajes ni la publicación anterior. Las referencias de la especificación deben permitir reconstruir los aportes y las correcciones de Allport sin copiar claves al repositorio.
+3. Sin regla validada: puntaje bruto pendiente y motivo. Con regla válida pero sin baremo validado: conservar el bruto, `SIN_BAREMO_VALIDADO` y ninguna conversión. Con norma válida pero sin fila: `SIN_COINCIDENCIA`. Estos estados se reutilizan del tema y no agregan valores al contrato API.
+4. Allport incompleto no se prorratea ni se imputa a cero; ALL-02 requiere decisión. La suma 240 solo se comprueba cuando todas las respuestas y la variante canónica estén resueltas. Thurstone tampoco se calcula solo por observar el eje 0–20.
+5. Para publicar una revisión cuantitativa validada, reutilizar `resultado.estado = DISPONIBLE` y `referencia_revision_vigente`, que debe identificar una revisión del propio resultado. Actualizar ambos y registrar `evento_auditoria` en la misma transacción. Un recálculo no cambia lo publicado hasta nueva validación. La matriz de permisos de sustitución sigue pendiente del flujo común; no se inventa un rol.
+6. Orientación vocacional conserva las respuestas y el estado común; no se publica una revisión numérica vacía ni se crean percentiles, eneatipos o diagnósticos a partir de respuestas abiertas. El contenido, versionado y aprobación de un eventual informe profesional quedan en OTR-03: el núcleo no almacena ese texto y las fuentes no especifican el entregable digital.
+
+### Registro de incógnitas
+
+Registro de este entregable, pendiente de conciliación por Iván con DOC-42. No se localizó un registro común accesible; se conservan los IDs de [DOC-38](https://docs.google.com/spreadsheets/d/11uwCtLcol-GVEJDItfXU_a1A8kAR7yNjCyPRIS97_48/edit) sin declarar resueltas sus dudas.
+
+| ID | Incógnita y evidencia | Responsable / decisión requerida | Estado e impacto |
+|---|---|---|---|
+| OTR-01 | Thurstone muestra áreas, marcas y gráfico, sin regla completa ni norma poblacional documentada. | DOC-37 / Iván / docente: confirmar corrección, omisiones, significado del índice y manual normativo. | Abierta. Catálogo propuesto; no habilitar cálculo ni conversión. |
+| OTR-02 | Allport: numeración y variante, omisiones, baremos, informe y edición aplicable. | DOC-38 / Iván / docente: resolver ALL-01 a ALL-05 con sus fuentes. | Abierta. No imputar ni usar `formulario_3.pdf` como fuente Allport; no inventar percentiles. |
+| OTR-03 | Los dos formatos de entrevista carecen de reglas de puntaje y salida profesional digital. | DOC-39 / Iván: confirmar versión autorizada, si existe informe y cómo se revisa/publica. | Abierta. No crear tabla narrativa o regla ficticia; definir su extensión al núcleo solo cuando se confirme el contenido. |
+| OTR-04 | El núcleo no define valores por alternativa/ordenación ni distingue todas las marcas de Thurstone. | Temas de ítems y respuestas / Iván, con DOC-37/38/39. | Abierta. Este tema consume respuestas validadas; no cambia sus tablas, contrato ni tipos. |
+| OTR-05 | Catálogo y revisiones del #114 son reutilizables; la FK normativa no BFA aún no está fijada. | Iván / DOC-42: ratificar `baremo`, `fila_baremo` y la extensión `conversion_resultado_escala.id_fila_baremo`, compatibilidad y permisos. | Propuesta. No modificar las FK BFA ni fusionar antes del cierre del tema. |
+
+### Casos de aceptación del diseño
+
+- Una revisión Allport completa produce seis registros únicos por escala; una segunda revisión mantiene la primera. La suma de control no se guarda como séptima escala.
+- Un puntaje bruto existente sin norma validada no produce conversión; un puntaje ausente no se transforma en cero.
+- Rechazar fila normativa de otra escala, versión o población, intervalos superpuestos y conversiones de estos tests que referencien rangos BFA.
+- Thurstone conserva «ambas», «ninguna» y ausencia como situaciones distintas; la corrección espera una especificación aprobada.
+- Una entrevista sin algoritmo no produce escalas ni resultados numéricos. La publicación cualitativa espera OTR-03.
+- Publicar una revisión validada y recalcular mantiene vigente la primera hasta validar y publicar la segunda, con auditoría.
+
+Estos casos son criterios documentales para la implementación posterior; no afirman que existan tablas físicas ni pruebas automatizadas de estas propuestas.

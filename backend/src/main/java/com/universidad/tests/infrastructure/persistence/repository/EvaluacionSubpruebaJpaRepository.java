@@ -8,4 +8,6 @@ public interface EvaluacionSubpruebaJpaRepository
         extends JpaRepository<EvaluacionSubpruebaJpaEntity, Long> {
 
     List<EvaluacionSubpruebaJpaEntity> findByIdEvaluacionOrderByOrdenAsc(Long idEvaluacion);
+
+    List<EvaluacionSubpruebaJpaEntity> findByIdEvaluacionInOrderByOrdenAsc(List<Long> ids);
 }

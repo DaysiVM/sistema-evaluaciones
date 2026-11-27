@@ -1,0 +1,447 @@
+TEST-32 — validación local de la carpeta «Evaluación» (tests/api/BFA.postman_collection.json)
+Fecha: 2026-11-25, 14:30 (hora de Nicaragua). Ejecutó: Rodrigo Romero (Testing).
+Backend: main 32fa29a en local, perfil demo (test BFA DEMO-1 publicado), PostgreSQL 17 en una base nueva.
+Datos ficticios cargados en la base local: cuenta COORDINADOR 9931 con una sesión (en la base solo el SHA-256 del token), sujeto 1 «Sujeto Ficticio TEST-32» y período 1 «T32-2026».
+Comando: newman 6.2.3 run tests/api/BFA.postman_collection.json -e tests/api/publico.postman_environment.json --folder "Evaluación" con base_url=http://localhost:8080, token, sujeto_id=1 y periodo_id=1 por --env-var.
+Versión de la carpeta: la previa al commit 8a03204; después solo cambiaron E7-08 (cuerpo fijo, para no depender de E6) y E3-03 (403 por la decisión de alcance del 25-nov).
+Resultado: 22 casos pasan (preparación, E3, E4 y todos los 401), 15 fallan porque E22, E24 y E5–E8 no estaban en ese main (404/405) y 12 quedan BLOQUEADOS en cadena.
+No es la corrida contra la URL pública: esa queda pendiente hasta que la base pública tenga las asignaciones cuenta–sujeto de los datos demo.
+
+------------------------------------------------------------------ salida de newman (reporter cli)
+(node:10476) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+newman
+
+BFA — API publicada (Sprint 03)
+
+□ Evaluación / 0 Preparación
+└ PREP-01 E1 catálogo → 200
+  GET http://localhost:8080/api/v1/tests [200 OK, 253B, 24ms]
+  √  HTTP 200
+  √  Hay un test BFA en el catálogo
+
+└ PREP-02 E2 detalle del test BFA → 200
+  GET http://localhost:8080/api/v1/tests/1 [200 OK, 2.97kB, 27ms]
+  √  HTTP 200
+  √  E2 trae versionFormularioId y las subpruebas VOC1 y VOC2
+
+└ PREP-03 E21 períodos → 200
+  GET http://localhost:8080/api/v1/periodos [200 OK, 295B, 6ms]
+  √  HTTP 200
+  √  Hay un período para usar
+
+└ PREP-04 sujeto: del entorno o E18 (preparación)
+  POST http://localhost:8080/api/v1/sujetos [404 Not Found, 363B, 7ms]
+  √  Hay un sujeto para usar (sujeto_id del entorno o creado con E18)
+
+└ PREP-05 E14 sesión de la cuenta evaluada → 200
+  POST http://localhost:8080/api/v1/auth/sesion [404 Not Found, 367B, 3ms]
+  1. HTTP 200
+
+□ Evaluación / E3 Crear evaluación
+└ E3-01 sin token → 401 NO_AUTENTICADO
+  POST http://localhost:8080/api/v1/evaluaciones [401 Unauthorized, 359B, 2ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+└ E3-02 sin versionFormularioId → 400 SOLICITUD_INVALIDA
+  POST http://localhost:8080/api/v1/evaluaciones [400 Bad Request, 386B, 6ms]
+  √  HTTP 400
+  √  Formato común de error con codigo SOLICITUD_INVALIDA
+
+└ E3-03 sujeto inexistente → 404 SUJETO_NO_ENCONTRADO
+  POST http://localhost:8080/api/v1/evaluaciones [404 Not Found, 344B, 8ms]
+  √  HTTP 404
+  √  Formato común de error con codigo SUJETO_NO_ENCONTRADO
+
+└ E3-04 período inexistente → 404 PERIODO_NO_ENCONTRADO
+  POST http://localhost:8080/api/v1/evaluaciones [404 Not Found, 345B, 8ms]
+  √  HTTP 404
+  √  Formato común de error con codigo PERIODO_NO_ENCONTRADO
+
+└ E3-05 subprueba que no está en la versión → 422 SUBPRUEBA_NO_INCLUIDA
+  POST http://localhost:8080/api/v1/evaluaciones [422 Unprocessable Entity (WebDAV) (RFC 4918), 404B, 11ms]
+  √  HTTP 422
+  √  Formato común de error con codigo SUBPRUEBA_NO_INCLUIDA
+
+└ E3-06 testId inexistente → 404 TEST_NO_ENCONTRADO
+  POST http://localhost:8080/api/v1/evaluaciones [404 Not Found, 345B, 7ms]
+  √  HTTP 404
+  √  Formato común de error con codigo TEST_NO_ENCONTRADO
+
+└ E3-07 testId de otro test → 422 VERSION_INCOMPATIBLE
+  POST http://localhost:8080/api/v1/evaluaciones [400 Bad Request, 350B, 4ms]
+  2. BLOQUEADO: falta {{test_otro_id}}
+
+└ E3-08 FV sin letra inicial → 409 LETRA_NO_ASIGNADA
+  POST http://localhost:8080/api/v1/evaluaciones [409 Conflict, 373B, 16ms]
+  √  HTTP 409
+  √  Formato común de error con codigo LETRA_NO_ASIGNADA
+
+└ E3-09 positivo: parcial VOC1 y VOC2 → 201
+  POST http://localhost:8080/api/v1/evaluaciones [201 Created, 506B, 16ms]
+  √  HTTP 201
+  √  Forma de E4
+  √  EN_CURSO, con los datos pedidos y VOC1 y VOC2 en PENDIENTE
+  √  Location apunta a la evaluación creada
+
+└ E3-10 repetir la misma → 409 EVALUACION_EN_CURSO
+  POST http://localhost:8080/api/v1/evaluaciones [409 Conflict, 378B, 11ms]
+  √  HTTP 409
+  √  Formato común de error con codigo EVALUACION_EN_CURSO
+
+□ Evaluación / E22 Listar evaluaciones
+└ E22-01 por sujeto → 200
+  GET http://localhost:8080/api/v1/evaluaciones?sujetoId=1 [405 Method Not Allowed, 310B, 5ms]
+  3. HTTP 200
+
+└ E22-02 sin token → 401 NO_AUTENTICADO
+  GET http://localhost:8080/api/v1/evaluaciones [401 Unauthorized, 359B, 1ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+□ Evaluación / E4 Consultar evaluación
+└ E4-01 positivo → 200
+  GET http://localhost:8080/api/v1/evaluaciones/2 [200 OK, 464B, 6ms]
+  √  HTTP 200
+  √  Forma de E4
+
+└ E4-02 inexistente → 404 EVALUACION_NO_ENCONTRADA
+  GET http://localhost:8080/api/v1/evaluaciones/999999999 [404 Not Found, 352B, 5ms]
+  √  HTTP 404
+  √  Formato común de error con codigo EVALUACION_NO_ENCONTRADA
+
+└ E4-03 sin token → 401 NO_AUTENTICADO
+  GET http://localhost:8080/api/v1/evaluaciones/2 [401 Unauthorized, 361B, 1ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+□ Evaluación / E24 Instrucciones
+└ E24-01 VOC1 → 200
+  GET http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/instrucciones [404 Not Found, 400B, 5ms]
+  4. HTTP 200
+
+└ E24-02 E4 después de E24: sin subprueba activa → 200
+  GET http://localhost:8080/api/v1/evaluaciones/2 [200 OK, 464B, 6ms]
+  √  HTTP 200
+  √  No consumió tiempo: subpruebaActiva nula y VOC1 PENDIENTE
+
+└ E24-03 subprueba inexistente → 404 SUBPRUEBA_NO_ENCONTRADA
+  GET http://localhost:8080/api/v1/evaluaciones/2/subpruebas/NOEXISTE/instrucciones [404 Not Found, 404B, 6ms]
+  √  HTTP 404
+  5. Formato común de error con codigo SUBPRUEBA_NO_ENCONTRADA
+
+└ E24-04 sin token → 401 NO_AUTENTICADO
+  GET http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/instrucciones [401 Unauthorized, 391B, 1ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+□ Evaluación / E5 Iniciar subprueba
+└ E5-01 VOC2 antes que VOC1 → 409 SUBPRUEBA_FUERA_DE_ORDEN
+  POST http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC2/iniciar [404 Not Found, 394B, 6ms]
+  6. HTTP 409
+  7. Formato común de error con codigo SUBPRUEBA_FUERA_DE_ORDEN
+
+└ E5-02 VOC1 → 200
+  POST http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/iniciar [404 Not Found, 394B, 6ms]
+  8. HTTP 200
+
+└ E5-03 repetir VOC1 → 200
+  POST http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/iniciar [404 Not Found, 394B, 5ms]
+  9. BLOQUEADO: falta fin_voc1 (de una solicitud anterior)
+
+└ E5-04 subprueba inexistente → 404 SUBPRUEBA_NO_ENCONTRADA
+  POST http://localhost:8080/api/v1/evaluaciones/2/subpruebas/NOEXISTE/iniciar [404 Not Found, 398B, 6ms]
+  √  HTTP 404
+ 10. Formato común de error con codigo SUBPRUEBA_NO_ENCONTRADA
+
+└ E5-05 sin token → 401 NO_AUTENTICADO
+  POST http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/iniciar [401 Unauthorized, 385B, 1ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+□ Evaluación / E6 Preguntas
+└ E6-01 VOC1 activa → 200
+  GET http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/preguntas [404 Not Found, 396B, 6ms]
+ 11. HTTP 200
+
+└ E6-02 VOC2 sin iniciar → 409 SUBPRUEBA_NO_ACTIVA
+  GET http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC2/preguntas [404 Not Found, 396B, 5ms]
+ 12. HTTP 409
+ 13. Formato común de error con codigo SUBPRUEBA_NO_ACTIVA
+
+└ E6-03 subprueba inexistente → 404 SUBPRUEBA_NO_ENCONTRADA
+  GET http://localhost:8080/api/v1/evaluaciones/2/subpruebas/NOEXISTE/preguntas [404 Not Found, 400B, 5ms]
+  √  HTTP 404
+ 14. Formato común de error con codigo SUBPRUEBA_NO_ENCONTRADA
+
+└ E6-04 sin token → 401 NO_AUTENTICADO
+  GET http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/preguntas [401 Unauthorized, 387B, 1ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+□ Evaluación / E7 Respuestas
+└ E7-01 positivo → 200
+  PUT http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/respuestas [404 Not Found, 397B, 6ms]
+ 15. BLOQUEADO: falta {{pregunta_id}}, {{opcion_ok}}
+
+└ E7-02 reenviar la misma → 200
+  PUT http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/respuestas [404 Not Found, 397B, 6ms]
+ 16. BLOQUEADO: falta {{pregunta_id}}, {{opcion_ok}}
+
+└ E7-03 JSON mal formado → 400 SOLICITUD_INVALIDA
+  PUT http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/respuestas [404 Not Found, 397B, 5ms]
+ 17. HTTP 400
+ 18. Formato común de error con codigo SOLICITUD_INVALIDA
+
+└ E7-04 sin preguntaId → 400 SOLICITUD_INVALIDA
+  PUT http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/respuestas [404 Not Found, 397B, 5ms]
+ 19. HTTP 400
+ 20. Formato común de error con codigo SOLICITUD_INVALIDA
+
+└ E7-05 opción que no es de la pregunta → 422 RESPUESTA_INVALIDA
+  PUT http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/respuestas [404 Not Found, 397B, 5ms]
+ 21. BLOQUEADO: falta {{pregunta_id}}
+
+└ E7-06 pregunta que no es de la subprueba → 422 RESPUESTA_INVALIDA
+  PUT http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/respuestas [404 Not Found, 397B, 5ms]
+ 22. HTTP 422
+ 23. Formato común de error con codigo RESPUESTA_INVALIDA
+
+└ E7-07 VOC2 sin iniciar → 409 SUBPRUEBA_NO_ACTIVA
+  PUT http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC2/respuestas [404 Not Found, 397B, 6ms]
+ 24. BLOQUEADO: falta {{pregunta_id}}
+
+└ E7-08 sin token → 401 NO_AUTENTICADO
+  PUT http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/respuestas [401 Unauthorized, 388B, 2ms]
+ 25. BLOQUEADO: falta {{pregunta_id}}
+
+□ Evaluación / E8 Finalizar
+└ E8-01 con VOC2 PENDIENTE → 409 SUBPRUEBAS_PENDIENTES
+  POST http://localhost:8080/api/v1/evaluaciones/2/finalizar [404 Not Found, 380B, 6ms]
+ 26. HTTP 409
+ 27. Formato común de error con codigo SUBPRUEBAS_PENDIENTES
+
+└ E8-02 inexistente → 404 EVALUACION_NO_ENCONTRADA
+  POST http://localhost:8080/api/v1/evaluaciones/999999999/finalizar [404 Not Found, 388B, 6ms]
+  √  HTTP 404
+ 28. Formato común de error con codigo EVALUACION_NO_ENCONTRADA
+
+└ E8-03 sin token → 401 NO_AUTENTICADO
+  POST http://localhost:8080/api/v1/evaluaciones/2/finalizar [401 Unauthorized, 371B, 1ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+□ Evaluación / 9 Vencimiento (lenta)
+└ VEN-01 E7 después del finLimite de VOC1 → 409 TIEMPO_AGOTADO|SUBPRUEBA_NO_ACTIVA
+  ┌
+  │ 'Esperando 0 s hasta el finLimite'
+  └
+  PUT http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC1/respuestas [404 Not Found, 397B, 5ms]
+ 29. BLOQUEADO: falta {{pregunta_id}}, {{opcion_ok}}
+
+└ VEN-02 E4: VOC1 cerrada por tiempo (BUG-01) → 200
+  GET http://localhost:8080/api/v1/evaluaciones/2 [200 OK, 464B, 7ms]
+ 30. BLOQUEADO: falta fin_voc1 (de una solicitud anterior)
+
+└ VEN-03 E5 VOC2 después del cierre por tiempo (BUG-01) → 200
+  POST http://localhost:8080/api/v1/evaluaciones/2/subpruebas/VOC2/iniciar [404 Not Found, 394B, 5ms]
+ 31. BLOQUEADO: falta fin_voc1 (de una solicitud anterior)
+
+└ VEN-04 E8 con VOC2 vencida → 200
+  ┌
+  │ 'Esperando 0 s hasta el finLimite'
+  └
+  POST http://localhost:8080/api/v1/evaluaciones/2/finalizar [404 Not Found, 380B, 6ms]
+ 32. BLOQUEADO: falta fin_voc2 (de una solicitud anterior)
+
+└ VEN-05 repetir E8 → 200
+  POST http://localhost:8080/api/v1/evaluaciones/2/finalizar [404 Not Found, 380B, 5ms]
+ 33. BLOQUEADO: falta resultado_id (de una solicitud anterior)
+
+┌─────────────────────────┬─────────────────┬─────────────────┐
+│                         │        executed │          failed │
+├─────────────────────────┼─────────────────┼─────────────────┤
+│              iterations │               1 │               0 │
+├─────────────────────────┼─────────────────┼─────────────────┤
+│                requests │              49 │               0 │
+├─────────────────────────┼─────────────────┼─────────────────┤
+│            test-scripts │              68 │               0 │
+├─────────────────────────┼─────────────────┼─────────────────┤
+│      prerequest-scripts │              58 │               0 │
+├─────────────────────────┼─────────────────┼─────────────────┤
+│              assertions │              82 │              33 │
+├─────────────────────────┴─────────────────┴─────────────────┤
+│ total run duration: 4.5s                                    │
+├─────────────────────────────────────────────────────────────┤
+│ total data received: 10.62kB (approx)                       │
+├─────────────────────────────────────────────────────────────┤
+│ average response time: 6ms [min: 1ms, max: 27ms, s.d.: 5ms] │
+└─────────────────────────────────────────────────────────────┘
+
+[31m   # [39m[31m failure        [39m[31m detail                                                                                                                         [39m
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 01.  AssertionError  HTTP 200                                                                                                                       
+                      expected response to have status code 200 but got 404                                                                          
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / 0 Preparación / PREP-05 E14 sesión de la cuenta evaluada → 200"                                           
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 02.  AssertionError  BLOQUEADO: falta {{test_otro_id}}                                                                                              
+                      precondición no cumplida                                                                                                       
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E3 Crear evaluación / E3-07 testId de otro test → 422 VERSION_INCOMPATIBLE"                               
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 03.  AssertionError  HTTP 200                                                                                                                       
+                      expected response to have status code 200 but got 405                                                                          
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E22 Listar evaluaciones / E22-01 por sujeto → 200"                                                        
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 04.  AssertionError  HTTP 200                                                                                                                       
+                      expected response to have status code 200 but got 404                                                                          
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E24 Instrucciones / E24-01 VOC1 → 200"                                                                    
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 05.  AssertionError  Formato común de error con codigo SUBPRUEBA_NO_ENCONTRADA                                                                      
+                      expected { …(4) } to have property 'codigo'                                                                                    
+                      at assertion:1 in test-script                                                                                                  
+                      inside "Evaluación / E24 Instrucciones / E24-03 subprueba inexistente → 404 SUBPRUEBA_NO_ENCONTRADA"                           
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 06.  AssertionError  HTTP 409                                                                                                                       
+                      expected response to have status code 409 but got 404                                                                          
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E5 Iniciar subprueba / E5-01 VOC2 antes que VOC1 → 409 SUBPRUEBA_FUERA_DE_ORDEN"                          
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 07.  AssertionError  Formato común de error con codigo SUBPRUEBA_FUERA_DE_ORDEN                                                                     
+                      expected { …(4) } to have property 'codigo'                                                                                    
+                      at assertion:1 in test-script                                                                                                  
+                      inside "Evaluación / E5 Iniciar subprueba / E5-01 VOC2 antes que VOC1 → 409 SUBPRUEBA_FUERA_DE_ORDEN"                          
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 08.  AssertionError  HTTP 200                                                                                                                       
+                      expected response to have status code 200 but got 404                                                                          
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E5 Iniciar subprueba / E5-02 VOC1 → 200"                                                                  
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 09.  AssertionError  BLOQUEADO: falta fin_voc1 (de una solicitud anterior)                                                                          
+                      precondición no cumplida                                                                                                       
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E5 Iniciar subprueba / E5-03 repetir VOC1 → 200"                                                          
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 10.  AssertionError  Formato común de error con codigo SUBPRUEBA_NO_ENCONTRADA                                                                      
+                      expected { …(4) } to have property 'codigo'                                                                                    
+                      at assertion:1 in test-script                                                                                                  
+                      inside "Evaluación / E5 Iniciar subprueba / E5-04 subprueba inexistente → 404 SUBPRUEBA_NO_ENCONTRADA"                         
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 11.  AssertionError  HTTP 200                                                                                                                       
+                      expected response to have status code 200 but got 404                                                                          
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E6 Preguntas / E6-01 VOC1 activa → 200"                                                                   
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 12.  AssertionError  HTTP 409                                                                                                                       
+                      expected response to have status code 409 but got 404                                                                          
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E6 Preguntas / E6-02 VOC2 sin iniciar → 409 SUBPRUEBA_NO_ACTIVA"                                          
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 13.  AssertionError  Formato común de error con codigo SUBPRUEBA_NO_ACTIVA                                                                          
+                      expected { …(4) } to have property 'codigo'                                                                                    
+                      at assertion:1 in test-script                                                                                                  
+                      inside "Evaluación / E6 Preguntas / E6-02 VOC2 sin iniciar → 409 SUBPRUEBA_NO_ACTIVA"                                          
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 14.  AssertionError  Formato común de error con codigo SUBPRUEBA_NO_ENCONTRADA                                                                      
+                      expected { …(4) } to have property 'codigo'                                                                                    
+                      at assertion:1 in test-script                                                                                                  
+                      inside "Evaluación / E6 Preguntas / E6-03 subprueba inexistente → 404 SUBPRUEBA_NO_ENCONTRADA"                                 
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 15.  AssertionError  BLOQUEADO: falta {{pregunta_id}}, {{opcion_ok}}                                                                                
+                      precondición no cumplida                                                                                                       
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E7 Respuestas / E7-01 positivo → 200"                                                                     
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 16.  AssertionError  BLOQUEADO: falta {{pregunta_id}}, {{opcion_ok}}                                                                                
+                      precondición no cumplida                                                                                                       
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E7 Respuestas / E7-02 reenviar la misma → 200"                                                            
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 17.  AssertionError  HTTP 400                                                                                                                       
+                      expected response to have status code 400 but got 404                                                                          
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E7 Respuestas / E7-03 JSON mal formado → 400 SOLICITUD_INVALIDA"                                          
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 18.  AssertionError  Formato común de error con codigo SOLICITUD_INVALIDA                                                                           
+                      expected { …(4) } to have property 'codigo'                                                                                    
+                      at assertion:1 in test-script                                                                                                  
+                      inside "Evaluación / E7 Respuestas / E7-03 JSON mal formado → 400 SOLICITUD_INVALIDA"                                          
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 19.  AssertionError  HTTP 400                                                                                                                       
+                      expected response to have status code 400 but got 404                                                                          
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E7 Respuestas / E7-04 sin preguntaId → 400 SOLICITUD_INVALIDA"                                            
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 20.  AssertionError  Formato común de error con codigo SOLICITUD_INVALIDA                                                                           
+                      expected { …(4) } to have property 'codigo'                                                                                    
+                      at assertion:1 in test-script                                                                                                  
+                      inside "Evaluación / E7 Respuestas / E7-04 sin preguntaId → 400 SOLICITUD_INVALIDA"                                            
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 21.  AssertionError  BLOQUEADO: falta {{pregunta_id}}                                                                                               
+                      precondición no cumplida                                                                                                       
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E7 Respuestas / E7-05 opción que no es de la pregunta → 422 RESPUESTA_INVALIDA"                           
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 22.  AssertionError  HTTP 422                                                                                                                       
+                      expected response to have status code 422 but got 404                                                                          
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E7 Respuestas / E7-06 pregunta que no es de la subprueba → 422 RESPUESTA_INVALIDA"                        
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 23.  AssertionError  Formato común de error con codigo RESPUESTA_INVALIDA                                                                           
+                      expected { …(4) } to have property 'codigo'                                                                                    
+                      at assertion:1 in test-script                                                                                                  
+                      inside "Evaluación / E7 Respuestas / E7-06 pregunta que no es de la subprueba → 422 RESPUESTA_INVALIDA"                        
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 24.  AssertionError  BLOQUEADO: falta {{pregunta_id}}                                                                                               
+                      precondición no cumplida                                                                                                       
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E7 Respuestas / E7-07 VOC2 sin iniciar → 409 SUBPRUEBA_NO_ACTIVA"                                         
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 25.  AssertionError  BLOQUEADO: falta {{pregunta_id}}                                                                                               
+                      precondición no cumplida                                                                                                       
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E7 Respuestas / E7-08 sin token → 401 NO_AUTENTICADO"                                                     
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 26.  AssertionError  HTTP 409                                                                                                                       
+                      expected response to have status code 409 but got 404                                                                          
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / E8 Finalizar / E8-01 con VOC2 PENDIENTE → 409 SUBPRUEBAS_PENDIENTES"                                      
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 27.  AssertionError  Formato común de error con codigo SUBPRUEBAS_PENDIENTES                                                                        
+                      expected { …(4) } to have property 'codigo'                                                                                    
+                      at assertion:1 in test-script                                                                                                  
+                      inside "Evaluación / E8 Finalizar / E8-01 con VOC2 PENDIENTE → 409 SUBPRUEBAS_PENDIENTES"                                      
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 28.  AssertionError  Formato común de error con codigo EVALUACION_NO_ENCONTRADA                                                                     
+                      expected { …(4) } to have property 'codigo'                                                                                    
+                      at assertion:1 in test-script                                                                                                  
+                      inside "Evaluación / E8 Finalizar / E8-02 inexistente → 404 EVALUACION_NO_ENCONTRADA"                                          
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 29.  AssertionError  BLOQUEADO: falta {{pregunta_id}}, {{opcion_ok}}                                                                                
+                      precondición no cumplida                                                                                                       
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / 9 Vencimiento (lenta) / VEN-01 E7 después del finLimite de VOC1 → 409 TIEMPO_AGOTADO|SUBPRUEBA_NO_ACTIVA" 
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 30.  AssertionError  BLOQUEADO: falta fin_voc1 (de una solicitud anterior)                                                                          
+                      precondición no cumplida                                                                                                       
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / 9 Vencimiento (lenta) / VEN-02 E4: VOC1 cerrada por tiempo (BUG-01) → 200"                                
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 31.  AssertionError  BLOQUEADO: falta fin_voc1 (de una solicitud anterior)                                                                          
+                      precondición no cumplida                                                                                                       
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / 9 Vencimiento (lenta) / VEN-03 E5 VOC2 después del cierre por tiempo (BUG-01) → 200"                      
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 32.  AssertionError  BLOQUEADO: falta fin_voc2 (de una solicitud anterior)                                                                          
+                      precondición no cumplida                                                                                                       
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / 9 Vencimiento (lenta) / VEN-04 E8 con VOC2 vencida → 200"                                                 
+[90m     [39m[90m                [39m[90m                                                                                                                                [39m
+ 33.  AssertionError  BLOQUEADO: falta resultado_id (de una solicitud anterior)                                                                      
+                      precondición no cumplida                                                                                                       
+                      at assertion:0 in test-script                                                                                                  
+                      inside "Evaluación / 9 Vencimiento (lenta) / VEN-05 repetir E8 → 200"                                                          

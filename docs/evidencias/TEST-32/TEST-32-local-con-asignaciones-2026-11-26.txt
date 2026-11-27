@@ -1,0 +1,307 @@
+TEST-32 — carpeta «Evaluación» completa contra main 479a575 + #161 (5394e0f) en local, con asignaciones cuenta–sujeto ficticias
+Fecha: 2026-11-26, 14:21–14:32 (hora de Nicaragua). Ejecutó: Rodrigo Romero (Testing).
+Base nueva evaluaciones_r161 (perfil demo, test BFA DEMO-1 publicado).
+Cuentas: SUJETO registrada con E13 (sujeto2-t32@ejemplo.test, id 2; inicia sesión con E14 en PREP-05); COORDINADOR 9961 cargada en la base con una sesión ficticia porque E13 responde 403 ROL_NO_AUTORIZADO para COORDINADOR.
+Asignaciones cuenta–sujeto cargadas a mano en cuenta_sujeto_asignado (9961 y 2 con el sujeto 1), como pide docs/arquitectura/decision-alcance-evaluaciones.md.
+Resultado: 48 pasan, 0 fallan, 1 BLOQUEADO (E3-07: el catálogo tiene un solo test).
+Extra E24 con curl: COORDINADOR → 403 SIN_PERMISO; SUJETO no asignado → 403 SIN_PERMISO.
+Las salidas no contienen la contraseña de prueba ni el token (comprobado).
+
+------------------------------------------------------------------ salida de newman (reporter cli)
+newman
+
+BFA — API publicada (Sprint 03)
+
+□ Evaluación / 0 Preparación
+└ PREP-01 E1 catálogo → 200
+  GET http://localhost:8080/api/v1/tests [200 OK, 253B, 32ms]
+  √  HTTP 200
+  √  Hay un test BFA en el catálogo
+
+└ PREP-02 E2 detalle del test BFA → 200
+  GET http://localhost:8080/api/v1/tests/1 [200 OK, 2.97kB, 35ms]
+  √  HTTP 200
+  √  E2 trae versionFormularioId y las subpruebas VOC1 y VOC2
+
+└ PREP-03 E21 períodos → 200
+  GET http://localhost:8080/api/v1/periodos [200 OK, 295B, 10ms]
+  √  HTTP 200
+  √  Hay un período para usar
+
+└ PREP-04 sujeto: del entorno o E18 (preparación)
+  POST http://localhost:8080/api/v1/sujetos [201 Created, 302B, 17ms]
+  √  Hay un sujeto para usar (sujeto_id del entorno o creado con E18)
+
+└ PREP-05 E14 sesión de la cuenta evaluada → 200
+  POST http://localhost:8080/api/v1/auth/sesion [200 OK, 461B, 1043ms]
+  √  HTTP 200
+
+□ Evaluación / E3 Crear evaluación
+└ E3-01 sin token → 401 NO_AUTENTICADO
+  POST http://localhost:8080/api/v1/evaluaciones [401 Unauthorized, 359B, 2ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+└ E3-02 sin versionFormularioId → 400 SOLICITUD_INVALIDA
+  POST http://localhost:8080/api/v1/evaluaciones [400 Bad Request, 386B, 27ms]
+  √  HTTP 400
+  √  Formato común de error con codigo SOLICITUD_INVALIDA
+
+└ E3-03 sujeto inexistente (no asignado) → 403 SIN_PERMISO
+  POST http://localhost:8080/api/v1/evaluaciones [403 Forbidden, 341B, 10ms]
+  √  HTTP 403
+  √  Formato común de error con codigo SIN_PERMISO
+
+└ E3-04 período inexistente → 404 PERIODO_NO_ENCONTRADO
+  POST http://localhost:8080/api/v1/evaluaciones [404 Not Found, 345B, 12ms]
+  √  HTTP 404
+  √  Formato común de error con codigo PERIODO_NO_ENCONTRADO
+
+└ E3-05 subprueba que no está en la versión → 422 SUBPRUEBA_NO_INCLUIDA
+  POST http://localhost:8080/api/v1/evaluaciones [422 Unprocessable Entity (WebDAV) (RFC 4918), 404B, 14ms]
+  √  HTTP 422
+  √  Formato común de error con codigo SUBPRUEBA_NO_INCLUIDA
+
+└ E3-06 testId inexistente → 404 TEST_NO_ENCONTRADO
+  POST http://localhost:8080/api/v1/evaluaciones [404 Not Found, 345B, 7ms]
+  √  HTTP 404
+  √  Formato común de error con codigo TEST_NO_ENCONTRADO
+
+└ E3-07 testId de otro test → 422 VERSION_INCOMPATIBLE
+  POST http://localhost:8080/api/v1/evaluaciones [400 Bad Request, 405B, 6ms]
+  1. BLOQUEADO: falta {{test_otro_id}}
+
+└ E3-08 FV sin letra inicial → 409 LETRA_NO_ASIGNADA
+  POST http://localhost:8080/api/v1/evaluaciones [409 Conflict, 373B, 15ms]
+  √  HTTP 409
+  √  Formato común de error con codigo LETRA_NO_ASIGNADA
+
+└ E3-09 positivo: parcial VOC1 y VOC2 → 201
+  POST http://localhost:8080/api/v1/evaluaciones [201 Created, 506B, 27ms]
+  √  HTTP 201
+  √  Forma de E4
+  √  EN_CURSO, con los datos pedidos y VOC1 y VOC2 en PENDIENTE
+  √  Location apunta a la evaluación creada
+
+└ E3-10 repetir la misma → 409 EVALUACION_EN_CURSO
+  POST http://localhost:8080/api/v1/evaluaciones [409 Conflict, 378B, 13ms]
+  √  HTTP 409
+  √  Formato común de error con codigo EVALUACION_EN_CURSO
+
+□ Evaluación / E22 Listar evaluaciones
+└ E22-01 por sujeto → 200
+  GET http://localhost:8080/api/v1/evaluaciones?sujetoId=1 [200 OK, 466B, 13ms]
+  √  HTTP 200
+  √  La lista contiene la evaluación creada
+  √  Forma de E4
+
+└ E22-02 sin token → 401 NO_AUTENTICADO
+  GET http://localhost:8080/api/v1/evaluaciones [401 Unauthorized, 359B, 1ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+□ Evaluación / E4 Consultar evaluación
+└ E4-01 positivo → 200
+  GET http://localhost:8080/api/v1/evaluaciones/1 [200 OK, 464B, 15ms]
+  √  HTTP 200
+  √  Forma de E4
+
+└ E4-02 inexistente → 404 EVALUACION_NO_ENCONTRADA
+  GET http://localhost:8080/api/v1/evaluaciones/999999999 [404 Not Found, 352B, 7ms]
+  √  HTTP 404
+  √  Formato común de error con codigo EVALUACION_NO_ENCONTRADA
+
+└ E4-03 sin token → 401 NO_AUTENTICADO
+  GET http://localhost:8080/api/v1/evaluaciones/1 [401 Unauthorized, 361B, 2ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+□ Evaluación / E24 Instrucciones
+└ E24-01 VOC1 → 200
+  GET http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/instrucciones [200 OK, 237B, 11ms]
+  √  HTTP 200
+  √  codigo, instrucciones y ejemplos
+
+└ E24-02 E4 después de E24: sin subprueba activa → 200
+  GET http://localhost:8080/api/v1/evaluaciones/1 [200 OK, 464B, 12ms]
+  √  HTTP 200
+  √  No consumió tiempo: subpruebaActiva nula y VOC1 PENDIENTE
+
+└ E24-03 subprueba inexistente → 404 SUBPRUEBA_NO_ENCONTRADA
+  GET http://localhost:8080/api/v1/evaluaciones/1/subpruebas/NOEXISTE/instrucciones [404 Not Found, 368B, 8ms]
+  √  HTTP 404
+  √  Formato común de error con codigo SUBPRUEBA_NO_ENCONTRADA
+
+└ E24-04 sin token → 401 NO_AUTENTICADO
+  GET http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/instrucciones [401 Unauthorized, 391B, 2ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+□ Evaluación / E5 Iniciar subprueba
+└ E5-01 VOC2 antes que VOC1 → 409 SUBPRUEBA_FUERA_DE_ORDEN
+  POST http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC2/iniciar [409 Conflict, 380B, 12ms]
+  √  HTTP 409
+  √  Formato común de error con codigo SUBPRUEBA_FUERA_DE_ORDEN
+
+└ E5-02 VOC1 → 200
+  POST http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/iniciar [200 OK, 324B, 11ms]
+  √  HTTP 200
+  √  ACTIVA, con inicio, finLimite y segundosRestantes
+  √  finLimite = inicio + duración oficial de E2 (300 s)
+
+└ E5-03 repetir VOC1 → 200
+  POST http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/iniciar [200 OK, 324B, 8ms]
+  √  HTTP 200
+  √  Idempotente: mismo inicio y finLimite
+
+└ E5-04 subprueba inexistente → 404 SUBPRUEBA_NO_ENCONTRADA
+  POST http://localhost:8080/api/v1/evaluaciones/1/subpruebas/NOEXISTE/iniciar [404 Not Found, 362B, 7ms]
+  √  HTTP 404
+  √  Formato común de error con codigo SUBPRUEBA_NO_ENCONTRADA
+
+└ E5-05 sin token → 401 NO_AUTENTICADO
+  POST http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/iniciar [401 Unauthorized, 385B, 1ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+□ Evaluación / E6 Preguntas
+└ E6-01 VOC1 activa → 200
+  GET http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/preguntas [200 OK, 1.52kB, 17ms]
+  √  HTTP 200
+  √  Preguntas con id, numero, enunciado, opciones y respuestaActual
+  √  No expone la clave
+
+└ E6-02 VOC2 sin iniciar → 409 SUBPRUEBA_NO_ACTIVA
+  GET http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC2/preguntas [409 Conflict, 362B, 7ms]
+  √  HTTP 409
+  √  Formato común de error con codigo SUBPRUEBA_NO_ACTIVA
+
+└ E6-03 subprueba inexistente → 404 SUBPRUEBA_NO_ENCONTRADA
+  GET http://localhost:8080/api/v1/evaluaciones/1/subpruebas/NOEXISTE/preguntas [404 Not Found, 364B, 7ms]
+  √  HTTP 404
+  √  Formato común de error con codigo SUBPRUEBA_NO_ENCONTRADA
+
+└ E6-04 sin token → 401 NO_AUTENTICADO
+  GET http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/preguntas [401 Unauthorized, 387B, 1ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+□ Evaluación / E7 Respuestas
+└ E7-01 positivo → 200
+  PUT http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/respuestas [200 OK, 242B, 17ms]
+  √  HTTP 200
+  √  codigo, registradas, totalRespondidas y segundosRestantes
+
+└ E7-02 reenviar la misma → 200
+  PUT http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/respuestas [200 OK, 242B, 12ms]
+  √  HTTP 200
+  √  totalRespondidas no aumenta
+
+└ E7-03 JSON mal formado → 400 SOLICITUD_INVALIDA
+  PUT http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/respuestas [400 Bad Request, 434B, 6ms]
+  √  HTTP 400
+  √  Formato común de error con codigo SOLICITUD_INVALIDA
+
+└ E7-04 sin preguntaId → 400 SOLICITUD_INVALIDA
+  PUT http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/respuestas [400 Bad Request, 434B, 6ms]
+  √  HTTP 400
+  √  Formato común de error con codigo SOLICITUD_INVALIDA
+
+└ E7-05 opción que no es de la pregunta → 422 RESPUESTA_INVALIDA
+  PUT http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/respuestas [422 Unprocessable Entity (WebDAV) (RFC 4918), 403B, 10ms]
+  √  HTTP 422
+  √  Formato común de error con codigo RESPUESTA_INVALIDA
+
+└ E7-06 pregunta que no es de la subprueba → 422 RESPUESTA_INVALIDA
+  PUT http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/respuestas [422 Unprocessable Entity (WebDAV) (RFC 4918), 419B, 8ms]
+  √  HTTP 422
+  √  Formato común de error con codigo RESPUESTA_INVALIDA
+
+└ E7-07 VOC2 sin iniciar → 409 SUBPRUEBA_NO_ACTIVA
+  PUT http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC2/respuestas [409 Conflict, 363B, 7ms]
+  √  HTTP 409
+  √  Formato común de error con codigo SUBPRUEBA_NO_ACTIVA
+
+└ E7-08 sin token → 401 NO_AUTENTICADO
+  PUT http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/respuestas [401 Unauthorized, 388B, 1ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+□ Evaluación / E8 Finalizar
+└ E8-01 con VOC2 PENDIENTE → 409 SUBPRUEBAS_PENDIENTES
+  POST http://localhost:8080/api/v1/evaluaciones/1/finalizar [409 Conflict, 383B, 11ms]
+  √  HTTP 409
+  √  Formato común de error con codigo SUBPRUEBAS_PENDIENTES
+
+└ E8-02 inexistente → 404 EVALUACION_NO_ENCONTRADA
+  POST http://localhost:8080/api/v1/evaluaciones/999999999/finalizar [404 Not Found, 359B, 9ms]
+  √  HTTP 404
+  √  Formato común de error con codigo EVALUACION_NO_ENCONTRADA
+
+└ E8-03 sin token → 401 NO_AUTENTICADO
+  POST http://localhost:8080/api/v1/evaluaciones/1/finalizar [401 Unauthorized, 371B, 2ms]
+  √  HTTP 401
+  √  Formato común de error con codigo NO_AUTENTICADO
+
+□ Evaluación / 9 Vencimiento (lenta)
+└ VEN-01 E7 después del finLimite de VOC1 → 409 TIEMPO_AGOTADO|SUBPRUEBA_NO_ACTIVA
+  ┌
+  │ 'Esperando 300 s hasta el finLimite'
+  └
+  PUT http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC1/respuestas [409 Conflict, 370B, 10ms]
+  √  HTTP 409
+  √  Formato común de error con codigo TIEMPO_AGOTADO o SUBPRUEBA_NO_ACTIVA
+
+└ VEN-02 E4: VOC1 cerrada por tiempo (BUG-01) → 200
+  GET http://localhost:8080/api/v1/evaluaciones/1 [200 OK, 487B, 11ms]
+  √  HTTP 200
+  √  VOC1 CERRADA con cerradaEn = finLimite
+
+└ VEN-03 E5 VOC2 después del cierre por tiempo (BUG-01) → 200
+  POST http://localhost:8080/api/v1/evaluaciones/1/subpruebas/VOC2/iniciar [200 OK, 324B, 10ms]
+  √  HTTP 200
+  √  VOC2 ACTIVA
+
+└ VEN-04 E8 con VOC2 vencida → 200
+  ┌
+  │ 'Esperando 362 s hasta el finLimite'
+  └
+  POST http://localhost:8080/api/v1/evaluaciones/1/finalizar [200 OK, 594B, 21ms]
+  √  HTTP 200
+  √  Forma de E4
+  √  FINALIZADA, con resultadoId y estadoResultado PENDIENTE_VALIDACION
+  √  VOC2 CERRADA con cerradaEn = finLimite
+
+└ VEN-05 repetir E8 → 200
+  POST http://localhost:8080/api/v1/evaluaciones/1/finalizar [200 OK, 594B, 14ms]
+  √  HTTP 200
+  √  Mismo resultadoId
+
+┌─────────────────────────┬────────────────────┬───────────────────┐
+│                         │           executed │            failed │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│              iterations │                  1 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│                requests │                 49 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│            test-scripts │                 68 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│      prerequest-scripts │                 58 │                 0 │
+├─────────────────────────┼────────────────────┼───────────────────┤
+│              assertions │                102 │                 1 │
+├─────────────────────────┴────────────────────┴───────────────────┤
+│ total run duration: 11m 7.8s                                     │
+├──────────────────────────────────────────────────────────────────┤
+│ total data received: 13.82kB (approx)                            │
+├──────────────────────────────────────────────────────────────────┤
+│ average response time: 31ms [min: 1ms, max: 1043ms, s.d.: 146ms] │
+└──────────────────────────────────────────────────────────────────┘
+
+[31m  # [39m[31m failure        [39m[31m detail                                                                                           [39m
+[90m    [39m[90m                [39m[90m                                                                                                  [39m
+ 1.  AssertionError  BLOQUEADO: falta {{test_otro_id}}                                                                
+                     precondición no cumplida                                                                         
+                     at assertion:0 in test-script                                                                    
+                     inside "Evaluación / E3 Crear evaluación / E3-07 testId de otro test → 422 VERSION_INCOMPATIBLE" 
+(node:13248) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)

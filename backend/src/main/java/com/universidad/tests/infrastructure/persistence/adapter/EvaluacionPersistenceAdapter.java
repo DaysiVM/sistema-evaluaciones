@@ -9,14 +9,18 @@ import com.universidad.tests.infrastructure.persistence.entity.EvaluacionJpaEnti
 import com.universidad.tests.infrastructure.persistence.entity.EvaluacionSubpruebaJpaEntity;
 import com.universidad.tests.infrastructure.persistence.repository.EvaluacionJpaRepository;
 import com.universidad.tests.infrastructure.persistence.repository.EvaluacionSubpruebaJpaRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public class EvaluacionPersistenceAdapter implements EvaluacionRepository {
+
+    private static final int TAMANO_LOTE = 1000;
 
     private final EvaluacionJpaRepository evaluacionJpa;
     private final EvaluacionSubpruebaJpaRepository subpruebaJpa;
@@ -31,6 +35,33 @@ public class EvaluacionPersistenceAdapter implements EvaluacionRepository {
     @Transactional(readOnly = true)
     public Optional<Evaluacion> buscarPorId(Long idEvaluacion) {
         return evaluacionJpa.findById(idEvaluacion).map(this::aDominio);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Evaluacion> buscarPorIds(List<Long> ids) {
+        List<Evaluacion> evaluaciones = new ArrayList<>();
+        for (int inicio = 0; inicio < ids.size(); inicio += TAMANO_LOTE) {
+            int fin = Math.min(inicio + TAMANO_LOTE, ids.size());
+            evaluaciones.addAll(buscarLote(ids.subList(inicio, fin)));
+        }
+        return evaluaciones;
+    }
+
+    private List<Evaluacion> buscarLote(List<Long> ids) {
+        var subpruebasPorEvaluacion =
+                subpruebaJpa.findByIdEvaluacionInOrderByOrdenAsc(ids).stream()
+                        .collect(
+                                Collectors.groupingBy(
+                                        EvaluacionSubpruebaJpaEntity::getIdEvaluacion));
+        return evaluacionJpa.findAllById(ids).stream()
+                .map(
+                        e ->
+                                aDominio(
+                                        e,
+                                        subpruebasPorEvaluacion.getOrDefault(
+                                                e.getIdEvaluacion(), List.of())))
+                .toList();
     }
 
     @Override

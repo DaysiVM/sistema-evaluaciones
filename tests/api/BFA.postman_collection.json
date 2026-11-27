@@ -167,8 +167,2169 @@
     },
     {
       "name": "Evaluación",
-      "description": "E3–E8 y E24. Casos de TEST-32.",
-      "item": []
+      "description": "TEST-32: flujo de evaluación (E3 a E8, E22 y E24) contra la URL pública con el entorno publico. Un positivo y los negativos del contrato (docs/api/openapi.yaml) por endpoint, con tests de código HTTP y de estructura JSON.\n\nOrden: «Acceso › E14» con una cuenta ACADEMICO o COORDINADOR; después esta carpeta completa. «9 Vencimiento» espera los tiempos oficiales.\n\nConvención: el nombre termina en «→ HTTP [CODIGO]» y el script de la carpeta comprueba el código HTTP y el formato común de error. Si a la URL le falta una variable, el caso queda BLOQUEADO.\n\nVariables de la corrida en memoria (collectionVariables). Del entorno, opcionales: sujeto_id, periodo_id, correo_evaluado. La contraseña solo en el «current value»; nunca en el repositorio.",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.variables.set('_bloqueado', '');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "(() => {",
+              "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+              "    const marca = pm.variables.get('_bloqueado');",
+              "    const faltan = enviado.match(/\\{\\{[^}]+\\}\\}/g) || (marca ? [marca] : null);",
+              "    if (faltan) {",
+              "        pm.test('BLOQUEADO: falta ' + faltan.join(', '), () => pm.expect.fail('precondición no cumplida'));",
+              "        return;",
+              "    }",
+              "    const m = pm.info.requestName.match(/→ (\\d{3})(?: ([A-Z_|]+))?/);",
+              "    if (!m) return;",
+              "    pm.test('HTTP ' + m[1], () => pm.response.to.have.status(Number(m[1])));",
+              "    if (Number(m[1]) >= 400) {",
+              "        pm.test('Formato común de error' + (m[2] ? ' con codigo ' + m[2].split('|').join(' o ') : ''), () => {",
+              "            const j = pm.response.json();",
+              "            pm.expect(j).to.have.property('codigo');",
+              "            pm.expect(j).to.have.property('mensaje');",
+              "            if (m[2]) pm.expect(m[2].split('|')).to.include(j.codigo);",
+              "        });",
+              "    }",
+              "})();"
+            ]
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "0 Preparación",
+          "description": "Correr antes «Acceso › E14» con una cuenta que cree evaluaciones (ACADEMICO o COORDINADOR). Lee el test BFA y su versión publicada (E1, E2), el período (E21) y el sujeto (sujeto_id del entorno, o E18 si ya está desplegado), y abre la sesión de la cuenta evaluada.",
+          "item": [
+            {
+              "name": "PREP-01 E1 catálogo → 200",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/tests",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "tests"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    const bfa = j.find((t) => t.codigo === 'BFA');",
+                      "    pm.test('Hay un test BFA en el catálogo', () => pm.expect(bfa).to.be.an('object'));",
+                      "    if (bfa) pm.collectionVariables.set('test_id', bfa.id);",
+                      "    const otro = j.find((t) => bfa && t.id !== bfa.id);",
+                      "    if (otro) pm.collectionVariables.set('test_otro_id', otro.id); else pm.collectionVariables.unset('test_otro_id');",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PREP-02 E2 detalle del test BFA → 200",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/tests/{{test_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "tests",
+                    "{{test_id}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    pm.test('E2 trae versionFormularioId y las subpruebas VOC1 y VOC2', () => {",
+                      "        pm.expect(j.versionFormularioId).to.be.a('number');",
+                      "        pm.expect(j.subpruebas.map((s) => s.codigo)).to.include.members(['VOC1', 'VOC2']);",
+                      "    });",
+                      "    pm.collectionVariables.set('version_id', j.versionFormularioId);",
+                      "    j.subpruebas.forEach((s) => pm.collectionVariables.set('duracion_' + s.codigo, s.tiempoLimiteSegundos));",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PREP-03 E21 períodos → 200",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/periodos",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "periodos"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    const p = pm.environment.get('periodo_id') || ((j.find((x) => x.disponible) || j[0]) || {}).id;",
+                      "    if (p) pm.collectionVariables.set('periodo_id', p);",
+                      "    pm.test('Hay un período para usar', () => pm.expect(p, 'periodo_id').to.be.ok);",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PREP-04 sujeto: del entorno o E18 (preparación)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/sujetos",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "sujetos"
+                  ]
+                },
+                "description": "E18 es de TEST-34; aquí solo prepara datos ficticios. Si el entorno trae sujeto_id se usa ese.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"identificadorInstitucional\": \"T32-{{$timestamp}}\",\n  \"nombres\": \"Sujeto\",\n  \"apellidos\": \"Ficticio TEST-32\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const s = pm.environment.get('sujeto_id') || (pm.response.code === 201 ? pm.response.json().id : null);",
+                      "if (s) pm.collectionVariables.set('sujeto_id', s);",
+                      "pm.test('Hay un sujeto para usar (sujeto_id del entorno o creado con E18)', () => pm.expect(s, 'sujeto_id').to.be.ok);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "PREP-05 E14 sesión de la cuenta evaluada → 200",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/auth/sesion",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "sesion"
+                  ]
+                },
+                "description": "Cuenta que responde la evaluación (E24 pide PRACTICA_REALIZAR); tiene que estar asignada al sujeto_id. Por omisión sujeto@ejemplo.test (GEN-34-BE), con la misma {{contrasena}} del entorno (solo «current value»). Si no abre sesión, E24 a E8 siguen con el token del aplicador.",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"correo\": \"{{correo_evaluado}}\",\n  \"contrasena\": \"{{contrasena}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (!pm.environment.get('correo_evaluado')) pm.environment.set('correo_evaluado', 'sujeto@ejemplo.test');"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.collectionVariables.set('token_evaluado', pm.response.code === 200 ? pm.response.json().token : pm.environment.get('token'));"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "E3 Crear evaluación",
+          "description": "POST /api/v1/evaluaciones. Primero los negativos (el sujeto aún no tiene evaluación en curso), después el positivo (aplicación parcial VOC1 y VOC2) y la repetición.",
+          "item": [
+            {
+              "name": "E3-01 sin token → 401 NO_AUTENTICADO",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"versionFormularioId\": {{version_id}},\n  \"sujetoId\": {{sujeto_id}},\n  \"periodoId\": {{periodo_id}},\n  \"subpruebas\": [\"VOC1\", \"VOC2\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "E3-02 sin versionFormularioId → 400 SOLICITUD_INVALIDA",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"sujetoId\": {{sujeto_id}},\n  \"periodoId\": {{periodo_id}},\n  \"subpruebas\": [\"VOC1\", \"VOC2\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "E3-03 sujeto inexistente (no asignado) → 403 SIN_PERMISO",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones"
+                  ]
+                },
+                "description": "docs/arquitectura/decision-alcance-evaluaciones.md (25-nov): para un sujeto no asignado E3 responde 403 antes de consultar sus datos, aunque el identificador no exista. Reemplaza el 404 SUJETO_NO_ENCONTRADO de openapi.yaml para este caso.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"versionFormularioId\": {{version_id}},\n  \"sujetoId\": 999999999,\n  \"periodoId\": {{periodo_id}},\n  \"subpruebas\": [\"VOC1\", \"VOC2\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "E3-04 período inexistente → 404 PERIODO_NO_ENCONTRADO",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"versionFormularioId\": {{version_id}},\n  \"sujetoId\": {{sujeto_id}},\n  \"periodoId\": 999999999,\n  \"subpruebas\": [\"VOC1\", \"VOC2\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "E3-05 subprueba que no está en la versión → 422 SUBPRUEBA_NO_INCLUIDA",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"versionFormularioId\": {{version_id}},\n  \"sujetoId\": {{sujeto_id}},\n  \"periodoId\": {{periodo_id}},\n  \"subpruebas\": [\"VOC1\", \"NOEXISTE\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "E3-06 testId inexistente → 404 TEST_NO_ENCONTRADO",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"testId\": 999999999,\n  \"versionFormularioId\": {{version_id}},\n  \"sujetoId\": {{sujeto_id}},\n  \"periodoId\": {{periodo_id}},\n  \"subpruebas\": [\"VOC1\", \"VOC2\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "E3-07 testId de otro test → 422 VERSION_INCOMPATIBLE",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones"
+                  ]
+                },
+                "description": "Necesita un segundo test en el catálogo (test_otro_id); si no hay, queda BLOQUEADO.",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"testId\": {{test_otro_id}},\n  \"versionFormularioId\": {{version_id}},\n  \"sujetoId\": {{sujeto_id}},\n  \"periodoId\": {{periodo_id}},\n  \"subpruebas\": [\"VOC1\", \"VOC2\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "E3-08 FV sin letra inicial → 409 LETRA_NO_ASIGNADA",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"versionFormularioId\": {{version_id}},\n  \"sujetoId\": {{sujeto_id}},\n  \"periodoId\": {{periodo_id}},\n  \"subpruebas\": [\"FV\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "E3-09 positivo: parcial VOC1 y VOC2 → 201",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"versionFormularioId\": {{version_id}},\n  \"sujetoId\": {{sujeto_id}},\n  \"periodoId\": {{periodo_id}},\n  \"subpruebas\": [\"VOC1\", \"VOC2\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 201) return;",
+                      "    const j = pm.response.json();",
+                      "    const e = j;",
+                      "    ",
+                      "    pm.test('Forma de E4', () => {",
+                      "        ['id', 'testId', 'sujetoId', 'periodoId', 'versionFormularioId', 'estado', 'fechaInicio', 'subpruebaActiva', 'subpruebas']",
+                      "            .forEach((k) => pm.expect(e, k).to.have.property(k));",
+                      "        e.subpruebas.forEach((s) => {",
+                      "            pm.expect(['PENDIENTE', 'ACTIVA', 'CERRADA']).to.include(s.estado);",
+                      "            pm.expect(s).to.have.property('cerradaEn');",
+                      "        });",
+                      "    });",
+                      "    pm.test('EN_CURSO, con los datos pedidos y VOC1 y VOC2 en PENDIENTE', () => {",
+                      "        pm.expect(j.estado).to.eql('EN_CURSO');",
+                      "        pm.expect(j.sujetoId).to.eql(Number(pm.collectionVariables.get('sujeto_id')));",
+                      "        pm.expect(j.periodoId).to.eql(Number(pm.collectionVariables.get('periodo_id')));",
+                      "        pm.expect(j.versionFormularioId).to.eql(Number(pm.collectionVariables.get('version_id')));",
+                      "        pm.expect(j.subpruebas.map((s) => s.codigo)).to.eql(['VOC1', 'VOC2']);",
+                      "        j.subpruebas.forEach((s) => { pm.expect(s.estado).to.eql('PENDIENTE'); pm.expect(s.cerradaEn).to.eql(null); });",
+                      "        pm.expect(j.subpruebaActiva).to.eql(null);",
+                      "    });",
+                      "    pm.test('Location apunta a la evaluación creada', () => pm.expect(pm.response.headers.get('Location')).to.include('/api/v1/evaluaciones/' + j.id));",
+                      "    pm.collectionVariables.set('evaluacion_id', j.id);",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "E3-10 repetir la misma → 409 EVALUACION_EN_CURSO",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"versionFormularioId\": {{version_id}},\n  \"sujetoId\": {{sujeto_id}},\n  \"periodoId\": {{periodo_id}},\n  \"subpruebas\": [\"VOC1\", \"VOC2\"]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "E22 Listar evaluaciones",
+          "description": "GET /api/v1/evaluaciones con filtros.",
+          "item": [
+            {
+              "name": "E22-01 por sujeto → 200",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones?sujetoId={{sujeto_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones"
+                  ],
+                  "query": [
+                    {
+                      "key": "sujetoId",
+                      "value": "{{sujeto_id}}"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    const e = j.find((x) => x.id === Number(pm.collectionVariables.get('evaluacion_id')));",
+                      "    pm.test('La lista contiene la evaluación creada', () => pm.expect(e).to.be.an('object'));",
+                      "    if (e) {",
+                      "    pm.test('Forma de E4', () => {",
+                      "        ['id', 'testId', 'sujetoId', 'periodoId', 'versionFormularioId', 'estado', 'fechaInicio', 'subpruebaActiva', 'subpruebas']",
+                      "            .forEach((k) => pm.expect(e, k).to.have.property(k));",
+                      "        e.subpruebas.forEach((s) => {",
+                      "            pm.expect(['PENDIENTE', 'ACTIVA', 'CERRADA']).to.include(s.estado);",
+                      "            pm.expect(s).to.have.property('cerradaEn');",
+                      "        });",
+                      "    });",
+                      "    }",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "E22-02 sin token → 401 NO_AUTENTICADO",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "E4 Consultar evaluación",
+          "description": "GET /api/v1/evaluaciones/{id}.",
+          "item": [
+            {
+              "name": "E4-01 positivo → 200",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    const e = j;",
+                      "    ",
+                      "    pm.test('Forma de E4', () => {",
+                      "        ['id', 'testId', 'sujetoId', 'periodoId', 'versionFormularioId', 'estado', 'fechaInicio', 'subpruebaActiva', 'subpruebas']",
+                      "            .forEach((k) => pm.expect(e, k).to.have.property(k));",
+                      "        e.subpruebas.forEach((s) => {",
+                      "            pm.expect(['PENDIENTE', 'ACTIVA', 'CERRADA']).to.include(s.estado);",
+                      "            pm.expect(s).to.have.property('cerradaEn');",
+                      "        });",
+                      "    });",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "E4-02 inexistente → 404 EVALUACION_NO_ENCONTRADA",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/999999999",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "999999999"
+                  ]
+                }
+              }
+            },
+            {
+              "name": "E4-03 sin token → 401 NO_AUTENTICADO",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "E24 Instrucciones",
+          "description": "GET …/subpruebas/{codigo}/instrucciones: antes de E5 y sin consumir tiempo.",
+          "item": [
+            {
+              "name": "E24-01 VOC1 → 200",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/instrucciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "instrucciones"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    pm.test('codigo, instrucciones y ejemplos', () => {",
+                      "        pm.expect(j.codigo).to.eql('VOC1');",
+                      "        pm.expect(j.instrucciones).to.be.a('string').and.not.be.empty;",
+                      "        pm.expect(j.ejemplos).to.be.an('array');",
+                      "    });",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "E24-02 E4 después de E24: sin subprueba activa → 200",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    pm.test('No consumió tiempo: subpruebaActiva nula y VOC1 PENDIENTE', () => {",
+                      "        pm.expect(j.subpruebaActiva).to.eql(null);",
+                      "        pm.expect(j.subpruebas.find((s) => s.codigo === 'VOC1').estado).to.eql('PENDIENTE');",
+                      "    });",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "E24-03 subprueba inexistente → 404 SUBPRUEBA_NO_ENCONTRADA",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/NOEXISTE/instrucciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "NOEXISTE",
+                    "instrucciones"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "E24-04 sin token → 401 NO_AUTENTICADO",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/instrucciones",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "instrucciones"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "E5 Iniciar subprueba",
+          "description": "POST …/subpruebas/{codigo}/iniciar, sin cuerpo.",
+          "item": [
+            {
+              "name": "E5-01 VOC2 antes que VOC1 → 409 SUBPRUEBA_FUERA_DE_ORDEN",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC2/iniciar",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC2",
+                    "iniciar"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "E5-02 VOC1 → 200",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/iniciar",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "iniciar"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    pm.test('ACTIVA, con inicio, finLimite y segundosRestantes', () => {",
+                      "        pm.expect(j.codigo).to.eql('VOC1');",
+                      "        pm.expect(j.estado).to.eql('ACTIVA');",
+                      "        pm.expect(j.segundosRestantes).to.be.a('number').and.above(0);",
+                      "    });",
+                      "    const dur = Number(pm.collectionVariables.get('duracion_VOC1'));",
+                      "    pm.test('finLimite = inicio + duración oficial de E2 (' + dur + ' s)', () =>",
+                      "        pm.expect((Date.parse(j.finLimite) - Date.parse(j.inicio)) / 1000).to.be.closeTo(dur, 1));",
+                      "    pm.collectionVariables.set('inicio_voc1', j.inicio);",
+                      "    pm.collectionVariables.set('fin_voc1', j.finLimite);",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "E5-03 repetir VOC1 → 200",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/iniciar",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "iniciar"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const faltan = [\"fin_voc1\"].filter((k) => !pm.collectionVariables.get(k));",
+                      "if (faltan.length) pm.variables.set('_bloqueado', faltan.join(', ') + ' (de una solicitud anterior)');"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    pm.test('Idempotente: mismo inicio y finLimite', () => {",
+                      "        pm.expect(j.inicio).to.eql(pm.collectionVariables.get('inicio_voc1'));",
+                      "        pm.expect(j.finLimite).to.eql(pm.collectionVariables.get('fin_voc1'));",
+                      "    });",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "E5-04 subprueba inexistente → 404 SUBPRUEBA_NO_ENCONTRADA",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/NOEXISTE/iniciar",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "NOEXISTE",
+                    "iniciar"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "E5-05 sin token → 401 NO_AUTENTICADO",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/iniciar",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "iniciar"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "E6 Preguntas",
+          "description": "GET …/subpruebas/{codigo}/preguntas: nunca la clave.",
+          "item": [
+            {
+              "name": "E6-01 VOC1 activa → 200",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/preguntas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "preguntas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    pm.test('Preguntas con id, numero, enunciado, opciones y respuestaActual', () => {",
+                      "        pm.expect(j.preguntas).to.be.an('array').that.is.not.empty;",
+                      "        j.preguntas.forEach((p) => ['id', 'numero', 'enunciado', 'opciones', 'respuestaActual'].forEach((k) => pm.expect(p, k).to.have.property(k)));",
+                      "    });",
+                      "    pm.test('No expone la clave', () => pm.expect(pm.response.text()).to.not.match(/\"(correcta|esCorrecta|clave|opcionCorrecta)\"/));",
+                      "    pm.collectionVariables.set('pregunta_id', j.preguntas[0].id);",
+                      "    pm.collectionVariables.set('opcion_ok', j.preguntas[0].opciones[0].letra);",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "E6-02 VOC2 sin iniciar → 409 SUBPRUEBA_NO_ACTIVA",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC2/preguntas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC2",
+                    "preguntas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "E6-03 subprueba inexistente → 404 SUBPRUEBA_NO_ENCONTRADA",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/NOEXISTE/preguntas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "NOEXISTE",
+                    "preguntas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "E6-04 sin token → 401 NO_AUTENTICADO",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/preguntas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "preguntas"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "E7 Respuestas",
+          "description": "PUT …/subpruebas/{codigo}/respuestas: registra o reemplaza mientras la subprueba esté ACTIVA; idempotente.",
+          "item": [
+            {
+              "name": "E7-01 positivo → 200",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/respuestas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "respuestas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"respuestas\": [ { \"preguntaId\": {{pregunta_id}}, \"opcion\": \"{{opcion_ok}}\" } ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const faltan = [\"pregunta_id\"].filter((k) => !pm.collectionVariables.get(k));",
+                      "if (faltan.length) pm.variables.set('_bloqueado', faltan.join(', ') + ' (de una solicitud anterior)');"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    pm.test('codigo, registradas, totalRespondidas y segundosRestantes', () => {",
+                      "        pm.expect(j.codigo).to.eql('VOC1');",
+                      "        ['registradas', 'totalRespondidas', 'segundosRestantes'].forEach((k) => pm.expect(j[k], k).to.be.a('number'));",
+                      "        pm.expect(j.totalRespondidas).to.be.at.least(1);",
+                      "    });",
+                      "    pm.collectionVariables.set('total_respondidas', j.totalRespondidas);",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "E7-02 reenviar la misma → 200",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/respuestas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "respuestas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"respuestas\": [ { \"preguntaId\": {{pregunta_id}}, \"opcion\": \"{{opcion_ok}}\" } ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const faltan = [\"total_respondidas\"].filter((k) => !pm.collectionVariables.get(k));",
+                      "if (faltan.length) pm.variables.set('_bloqueado', faltan.join(', ') + ' (de una solicitud anterior)');"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    pm.test('totalRespondidas no aumenta', () => pm.expect(j.totalRespondidas).to.eql(Number(pm.collectionVariables.get('total_respondidas'))));",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "E7-03 JSON mal formado → 400 SOLICITUD_INVALIDA",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/respuestas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "respuestas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{ \"respuestas\": [ ",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "E7-04 sin preguntaId → 400 SOLICITUD_INVALIDA",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/respuestas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "respuestas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"respuestas\": [ { \"opcion\": \"A\" } ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "E7-05 opción que no es de la pregunta → 422 RESPUESTA_INVALIDA",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/respuestas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "respuestas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"respuestas\": [ { \"preguntaId\": {{pregunta_id}}, \"opcion\": \"Z\" } ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "E7-06 pregunta que no es de la subprueba → 422 RESPUESTA_INVALIDA",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/respuestas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "respuestas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"respuestas\": [ { \"preguntaId\": 999999999, \"opcion\": \"A\" } ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "E7-07 VOC2 sin iniciar → 409 SUBPRUEBA_NO_ACTIVA",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC2/respuestas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC2",
+                    "respuestas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"respuestas\": [ { \"preguntaId\": {{pregunta_id}}, \"opcion\": \"A\" } ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            },
+            {
+              "name": "E7-08 sin token → 401 NO_AUTENTICADO",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/respuestas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "respuestas"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"respuestas\": [ { \"preguntaId\": 1, \"opcion\": \"A\" } ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "E8 Finalizar",
+          "description": "POST /api/v1/evaluaciones/{id}/finalizar. El positivo está en «9 Vencimiento», porque necesita VOC1 y VOC2 cerradas.",
+          "item": [
+            {
+              "name": "E8-01 con VOC2 PENDIENTE → 409 SUBPRUEBAS_PENDIENTES",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/finalizar",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "finalizar"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "E8-02 inexistente → 404 EVALUACION_NO_ENCONTRADA",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/999999999/finalizar",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "999999999",
+                    "finalizar"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "E8-03 sin token → 401 NO_AUTENTICADO",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/finalizar",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "finalizar"
+                  ]
+                },
+                "auth": {
+                  "type": "noauth"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "9 Vencimiento (lenta)",
+          "description": "Espera el finLimite oficial de VOC1 y de VOC2 (varios minutos). Cubre TC-GEN-03-019 (BUG-01: el cierre por tiempo queda registrado y deja iniciar la siguiente) y el positivo de E8 (TC-GEN-04-011, 014 y 018). Correr al final.",
+          "item": [
+            {
+              "name": "VEN-01 E7 después del finLimite de VOC1 → 409 TIEMPO_AGOTADO|SUBPRUEBA_NO_ACTIVA",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC1/respuestas",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC1",
+                    "respuestas"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"respuestas\": [ { \"preguntaId\": {{pregunta_id}}, \"opcion\": \"{{opcion_ok}}\" } ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const faltan = [\"fin_voc1\"].filter((k) => !pm.collectionVariables.get(k));",
+                      "if (faltan.length) pm.variables.set('_bloqueado', faltan.join(', ') + ' (de una solicitud anterior)');",
+                      "",
+                      "const fin = Date.parse(pm.collectionVariables.get('fin_voc1'));",
+                      "const ms = Math.min(Math.max(fin - Date.now() + 2000, 0), 900000) || 0;",
+                      "console.log('Esperando ' + Math.round(ms / 1000) + ' s hasta el finLimite');",
+                      "setTimeout(() => {}, ms);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "VEN-02 E4: VOC1 cerrada por tiempo (BUG-01) → 200",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const faltan = [\"fin_voc1\"].filter((k) => !pm.collectionVariables.get(k));",
+                      "if (faltan.length) pm.variables.set('_bloqueado', faltan.join(', ') + ' (de una solicitud anterior)');"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    const voc1 = j.subpruebas.find((s) => s.codigo === 'VOC1');",
+                      "    pm.test('VOC1 CERRADA con cerradaEn = finLimite', () => {",
+                      "        pm.expect(voc1.estado).to.eql('CERRADA');",
+                      "        pm.expect(Date.parse(voc1.cerradaEn)).to.eql(Date.parse(pm.collectionVariables.get('fin_voc1')));",
+                      "    });",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "VEN-03 E5 VOC2 después del cierre por tiempo (BUG-01) → 200",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/subpruebas/VOC2/iniciar",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "subpruebas",
+                    "VOC2",
+                    "iniciar"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const faltan = [\"fin_voc1\"].filter((k) => !pm.collectionVariables.get(k));",
+                      "if (faltan.length) pm.variables.set('_bloqueado', faltan.join(', ') + ' (de una solicitud anterior)');"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    pm.test('VOC2 ACTIVA', () => pm.expect(j.estado).to.eql('ACTIVA'));",
+                      "    pm.collectionVariables.set('fin_voc2', j.finLimite);",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "VEN-04 E8 con VOC2 vencida → 200",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/finalizar",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "finalizar"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const faltan = [\"fin_voc2\"].filter((k) => !pm.collectionVariables.get(k));",
+                      "if (faltan.length) pm.variables.set('_bloqueado', faltan.join(', ') + ' (de una solicitud anterior)');",
+                      "",
+                      "const fin = Date.parse(pm.collectionVariables.get('fin_voc2'));",
+                      "const ms = Math.min(Math.max(fin - Date.now() + 2000, 0), 900000) || 0;",
+                      "console.log('Esperando ' + Math.round(ms / 1000) + ' s hasta el finLimite');",
+                      "setTimeout(() => {}, ms);"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    const e = j;",
+                      "    ",
+                      "    pm.test('Forma de E4', () => {",
+                      "        ['id', 'testId', 'sujetoId', 'periodoId', 'versionFormularioId', 'estado', 'fechaInicio', 'subpruebaActiva', 'subpruebas']",
+                      "            .forEach((k) => pm.expect(e, k).to.have.property(k));",
+                      "        e.subpruebas.forEach((s) => {",
+                      "            pm.expect(['PENDIENTE', 'ACTIVA', 'CERRADA']).to.include(s.estado);",
+                      "            pm.expect(s).to.have.property('cerradaEn');",
+                      "        });",
+                      "    });",
+                      "    pm.test('FINALIZADA, con resultadoId y estadoResultado PENDIENTE_VALIDACION', () => {",
+                      "        pm.expect(j.estado).to.eql('FINALIZADA');",
+                      "        pm.expect(j.resultadoId).to.be.ok;",
+                      "        pm.expect(j.estadoResultado).to.eql('PENDIENTE_VALIDACION');",
+                      "    });",
+                      "    pm.test('VOC2 CERRADA con cerradaEn = finLimite', () => {",
+                      "        const voc2 = j.subpruebas.find((s) => s.codigo === 'VOC2');",
+                      "        pm.expect(voc2.estado).to.eql('CERRADA');",
+                      "        pm.expect(Date.parse(voc2.cerradaEn)).to.eql(Date.parse(pm.collectionVariables.get('fin_voc2')));",
+                      "    });",
+                      "    pm.collectionVariables.set('resultado_id', j.resultadoId);",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "VEN-05 repetir E8 → 200",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/api/v1/evaluaciones/{{evaluacion_id}}/finalizar",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "evaluaciones",
+                    "{{evaluacion_id}}",
+                    "finalizar"
+                  ]
+                },
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{token_evaluado}}",
+                      "type": "string"
+                    }
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const faltan = [\"resultado_id\"].filter((k) => !pm.collectionVariables.get(k));",
+                      "if (faltan.length) pm.variables.set('_bloqueado', faltan.join(', ') + ' (de una solicitud anterior)');"
+                    ]
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "(() => {",
+                      "    const enviado = pm.request.url.toString() + (pm.request.body ? pm.request.body.toString() : '');",
+                      "    if (enviado.includes('{{') || pm.variables.get('_bloqueado') || pm.response.code !== 200) return;",
+                      "    const j = pm.response.json();",
+                      "    pm.test('Mismo resultadoId', () => pm.expect(String(j.resultadoId)).to.eql(String(pm.collectionVariables.get('resultado_id'))));",
+                      "})();"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     {
       "name": "Resultados",
